@@ -7,7 +7,7 @@
   </head>
   <body>
     <p>success!!!</p>
-    <input type="file" id="file" />
+    <input type="file" id="file" name="name" />
     <button id="upload">Upload gcode</button>
 
     <script>
@@ -20,47 +20,34 @@
         fileReader.readAsArrayBuffer(file.files[0]);
         fileReader.onload = async (event) => {
           const content = event.target.result;
-          const chunkSize = 1000;
-          const totalChunks = content.byteLength / chunkSize;
+          const chunkSize = 14 * 1024;
+          const totalChunks = Math.ceil(content.byteLength / chunkSize);
           console.log("total chunks", totalChunks);
-          console.log("file", fileReader);
-
-          // let payload = {
-          //   method: "POST",
-          //   headers: {
-          //     blah: "blah",
-          //   },
-          //   body: content,
-          // };
-          // console.log("payload is", payload);
-          // await fetch("/upload?fileName=" + file.name, payload);
+          console.log("file name", file.files[0].name);
 
           // //file segmentation
-          for (
-            let chunkNumber = 0;
-            chunkNumber < totalChunks + 1;
-            chunkNumber++
-          ) {
+          for (let chunkNumber = 0; chunkNumber < totalChunks; chunkNumber++) {
             console.log("doing chunk number", chunkNumber);
             let fileChunk = content.slice(
               chunkNumber * chunkSize,
               (chunkNumber + 1) * chunkSize
             );
-            console.log("fileChunk", fileChunk);
+            const start = chunkNumber * chunkSize;
+            const contentRange = `bytes ${start}/${content.byteLength}`;
+            const fileName = file.files[0].name;
             let payload = {
               method: "POST",
               headers: {
-                "content-length": fileChunk.byteLength,
-                "sequence-number": chunkNumber,
-                "total-chunks": totalChunks,
+                "Content-Type": "application/octet-stream",
+                "Content-Length": fileChunk.byteLength,
+                "Content-Range": contentRange,
+                "Content-Disposition": `attachment; filename="${fileName}"`,
               },
-              // body: "here is a fake body",
               body: fileChunk,
             };
             console.log("payload", payload);
-            // await fetch("/upload?fileName=" + file.name, payload);
             await fetch("/upload", payload);
-          } //end of file segmentation
+          }
         };
       });
     </script>

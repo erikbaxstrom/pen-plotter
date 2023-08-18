@@ -3,7 +3,6 @@ import socket
 from secrets import WIFI_SSID, WIFI_KEY
 from time import sleep
 from print_interface import run_stepper
-from webpages import index
 
 
 

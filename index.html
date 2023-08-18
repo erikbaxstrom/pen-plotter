@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pen Plotter</title>
+  </head>
+  <body>
+    <p>success!!!</p>
+    <input type="file" id="file" />
+    <button id="upload">Upload gcode</button>
+
+    <script>
+      const file = document.getElementById("file");
+      const upload = document.getElementById("upload");
+
+      upload.addEventListener("click", () => {
+        event.preventDefault();
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file.files[0]);
+        fileReader.onload = async (event) => {
+          const content = event.target.result;
+          const chunkSize = 1000;
+          const totalChunks = content.byteLength / chunkSize;
+          console.log("total chunks", totalChunks);
+          console.log("file", fileReader);
+
+          // let payload = {
+          //   method: "POST",
+          //   headers: {
+          //     blah: "blah",
+          //   },
+          //   body: content,
+          // };
+          // console.log("payload is", payload);
+          // await fetch("/upload?fileName=" + file.name, payload);
+
+          // //file segmentation
+          for (
+            let chunkNumber = 0;
+            chunkNumber < totalChunks + 1;
+            chunkNumber++
+          ) {
+            console.log("doing chunk number", chunkNumber);
+            let fileChunk = content.slice(
+              chunkNumber * chunkSize,
+              (chunkNumber + 1) * chunkSize
+            );
+            console.log("fileChunk", fileChunk);
+            let payload = {
+              method: "POST",
+              headers: {
+                "content-length": fileChunk.byteLength,
+                "sequence-number": chunkNumber,
+                "total-chunks": totalChunks,
+              },
+              // body: "here is a fake body",
+              body: fileChunk,
+            };
+            console.log("payload", payload);
+            // await fetch("/upload?fileName=" + file.name, payload);
+            await fetch("/upload", payload);
+          } //end of file segmentation
+        };
+      });
+    </script>
+  </body>
+</html>

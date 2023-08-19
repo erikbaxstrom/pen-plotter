@@ -6,13 +6,14 @@
     <title>Pen Plotter</title>
   </head>
   <body>
-    <p>success!!!</p>
     <input type="file" id="file" name="name" />
     <button id="upload">Upload gcode</button>
+    <button id="print" disabled="true">Print</button>
 
     <script>
       const file = document.getElementById("file");
       const upload = document.getElementById("upload");
+      const printButton = document.getElementById("print");
 
       upload.addEventListener("click", () => {
         event.preventDefault();
@@ -47,8 +48,16 @@
             };
             console.log("payload", payload);
             await fetch("/upload", payload);
+            printButton.disabled = false;
           }
         };
+      });
+
+      printButton.addEventListener("click", () => {
+        event.preventDefault();
+        console.log("starting print");
+        printButton.disabled = true;
+        fetch("/print");
       });
     </script>
   </body>

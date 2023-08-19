@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pen Plotter</title>
+  </head>
+  <body>
+    <p>success!!!</p>
+    <input type="file" id="file" name="name" />
+    <button id="upload">Upload gcode</button>
+
+    <script>
+      const file = document.getElementById("file");
+      const upload = document.getElementById("upload");
+
+      upload.addEventListener("click", () => {
+        event.preventDefault();
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file.files[0]);
+        fileReader.onload = async (event) => {
+          const content = event.target.result;
+          const chunkSize = 14 * 1024;
+          const totalChunks = Math.ceil(content.byteLength / chunkSize);
+          console.log("total chunks", totalChunks);
+          console.log("file name", file.files[0].name);
+
+          // //file segmentation
+          for (let chunkNumber = 0; chunkNumber < totalChunks; chunkNumber++) {
+            console.log("doing chunk number", chunkNumber);
+            let fileChunk = content.slice(
+              chunkNumber * chunkSize,
+              (chunkNumber + 1) * chunkSize
+            );
+            const start = chunkNumber * chunkSize;
+            const contentRange = `bytes ${start}/${content.byteLength}`;
+            const fileName = file.files[0].name;
+            let payload = {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/octet-stream",
+                "Content-Length": fileChunk.byteLength,
+                "Content-Range": contentRange,
+                "Content-Disposition": `attachment; filename="${fileName}"`,
+              },
+              body: fileChunk,
+            };
+            console.log("payload", payload);
+            await fetch("/upload", payload);
+          }
+        };
+      });
+    </script>
+  </body>
+</html>

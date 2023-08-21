@@ -1,5 +1,5 @@
 
-class print_manager:
+class file_manager:
     def __init__(self, print_controller):
         self.print_string = ''
         self.print_controller = print_controller

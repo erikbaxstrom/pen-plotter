@@ -18,4 +18,4 @@ class file_manager:
             if code[0] == ';':
                 print('passing over a ;comment', code)
                 pass
-            self.print_controller.print_line(code)
+            self.print_controller.execute_gcode(code)

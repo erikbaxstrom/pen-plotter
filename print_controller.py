@@ -1,7 +1,7 @@
 from math import sqrt
 from machine import Pin
 from time import sleep
-from motor_controller import motor_controller
+# from motor_controller import motor_controller
 
 steps_per_mm = 1
 

@@ -1,7 +1,7 @@
 from machine import Pin
-from rp2 import StateMachine
+from rp2 import StateMachine, PIO
 from time import sleep
-from pio_stepper import pio_step
+from pio_stepper import pio_step, pio_pace
 
 
 class motor_controller:
@@ -12,6 +12,7 @@ class motor_controller:
         self.pattern = int(('1000' + '0100' + '0010' + '0001') * 2, 2) # The bit mask pattern. Four x 4-bit masks, but state machine takes 32bit word, so double the sequence. Use base 2.
         self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 
         out_base=Pin(base_pin))
+        self.pacer = StateMachine(sm_number+1, pio_pace, freq=10000)
         self.sm.irq(self.busy_handler)
         self.is_busy = False
         self.sm.active(1)
@@ -33,14 +34,15 @@ class motor_controller:
         print('handler running with is_busy = ', self.is_busy)
         self.is_busy = False
 
-    def step(self, steps):
-        print('running this many steps:', steps)
-        print('running this pattern:', self.pattern)
+    def step(self, steps, pace):
+        print('running this many steps:', steps, 'at pace', pace)
         self.is_busy = True
+
         self.sm.put(steps)
         print('done put steps')
         self.sm.put(self.pattern)
         print('done put pattern')
+        # self.pacer.put(pace)
 
 
         # adjust index
@@ -74,13 +76,13 @@ right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER)
 
 
 # run a test sequence (run steps, wait, run more steps, wait, run negative steps)
-steps = [(512, 128), (512, 0), (512, 128)]
+steps = [(512, 100, 128, 0), (512, 0, 0, 0), (512, 0, 128, 0)]
 
 for step in steps:
     while left_motor.is_busy or right_motor.is_busy:
         print('not ready: left, right', left_motor.is_busy, right_motor.is_busy)
         sleep(1)
-    print('calling steps', step[0], step[1])
-    left_motor.step(step[0])
-    right_motor.step(step[1])
+    print('calling steps', step)
+    left_motor.step(step[0], step[1])
+    right_motor.step(step[2], step[3])
    

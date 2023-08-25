@@ -22,21 +22,21 @@ def pio_step():
     label("step")
     out(pins, 4) [31] # output four bits from the osr to the pins
     jmp(x_dec, "loop") # decrement x and jump back to the beginning of the loop
-    wait(0, irq, rel(2)) # wait on irq from counter
+#     wait(0, irq, rel(2)) # wait on irq from counter
 
     label("end")
     irq(block, rel(0)) # raise flag to handler that we're done
 #     nop()
 
 
-@asm_pio()
-def pio_pace():
-#     pull(block)
-#     wrap_target()
-    irq(clear, rel(2))
-#     mov(x, osr)
-#     wait(1, irq, rel(4))
-#     label("countdown")
-#     jmp(x_dec, "countdown")
-#     irq(clear, rel(4))
-    # wait(1, irq, rel(4))
+# @asm_pio()
+# def pio_pace():
+# #     pull(block)
+# #     wrap_target()
+#     irq(clear, rel(2))
+# #     mov(x, osr)
+# #     wait(1, irq, rel(4))
+# #     label("countdown")
+# #     jmp(x_dec, "countdown")
+# #     irq(clear, rel(4))
+#     # wait(1, irq, rel(4))

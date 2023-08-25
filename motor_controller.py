@@ -45,6 +45,10 @@ class motor_controller:
         self.sm.put(steps)
         self.sm.put(bitmask)
         print('done put steps, bitmask', bitmask, steps)
+    
+    def deactivate(self):
+        self.sm.exec("set(pins,0)")
+        self.sm.active(0)
 
 
         # adjust index
@@ -80,7 +84,7 @@ right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_D
 
 
 # run a test sequence (run steps, wait, run more steps, wait, run negative steps)
-steps = [(512, 128), (-512, 0), (512, 128)]
+steps = [(512, 128), (-512, 0), (512, -128)]
 
 for step in steps:
     while left_motor.is_busy or right_motor.is_busy:
@@ -89,4 +93,8 @@ for step in steps:
     print('calling steps', step)
     left_motor.step(step[0])
     right_motor.step(step[1])
+while left_motor.is_busy or right_motor.is_busy:
+    sleep(1)
+left_motor.deactivate()
+right_motor.deactivate()
    

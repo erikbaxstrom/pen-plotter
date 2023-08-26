@@ -3,9 +3,7 @@ from machine import Pin
 from time import sleep
 from motor_controller import motor_controller
 
-STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution
-CANVAS_WIDTH = 600  # units: mm
-CANVAS_HEIGHT = 600  # units: mm
+
 LEFT_SM_BASE_PIN = 6
 RIGHT_SM_BASE_PIN = 2
 LEFT_SM_NUMBER = 0
@@ -74,16 +72,21 @@ class print_controller:
 
 
 
-# TEST CODE
-
-test_coords = [(300,0), (300,100), (200, 100), (200, 0), (300, 0)]
-controller = print_controller(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
+# # TEST CODE
 
 
-for coord in test_coords:
-    print("calling controller.move_to_coord()", coord)
-    controller.move_to_coord(coord[0], coord[1])
+# STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution
+# CANVAS_WIDTH = 600  # units: mm
+# CANVAS_HEIGHT = 600  # units: mm
 
-controller.finish_print()
+# test_coords = [(300,0), (300,100), (200, 100), (200, 0), (300, 0)]
+# controller = print_controller(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
+
+
+# for coord in test_coords:
+#     print("calling controller.move_to_coord()", coord)
+#     controller.move_to_coord(coord[0], coord[1])
+
+# controller.finish_print()
         
 

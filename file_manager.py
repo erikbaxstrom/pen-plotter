@@ -1,5 +1,5 @@
 
-class print_manager:
+class file_manager:
     def __init__(self, print_controller):
         self.print_string = ''
         self.print_controller = print_controller
@@ -18,4 +18,4 @@ class print_manager:
             if code[0] == ';':
                 print('passing over a ;comment', code)
                 pass
-            self.print_controller.print_line(code)
+            self.print_controller.execute_gcode(code)

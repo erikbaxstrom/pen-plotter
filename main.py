@@ -3,9 +3,14 @@ from microdot import Microdot, Response, send_file
 from file_manager import file_manager
 from print_controller import print_controller
 
+
+STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution
+CANVAS_WIDTH = 600  # units: mm
+CANVAS_HEIGHT = 600  # units: mm
+
 app = Microdot()
 Response.default_content_type = 'text/html'
-print_controller = print_controller()
+print_controller = print_controller(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
 file_manager = file_manager(print_controller)
 
 @app.route('/')

@@ -19,3 +19,4 @@ class file_manager:
                 print('passing over a ;comment', code)
                 pass
             self.print_controller.execute_gcode(code)
+        self.print_controller.finish_print()

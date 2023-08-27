@@ -48,12 +48,12 @@
 
       // State
       let nudgeButtons = [
-        { name: "Up 100 mm", id: "Up100", dist: 100 },
-        { name: "Up 10 mm", id: "Up10", dist: 10 },
-        { name: "Up 1 mm", id: "Up1", dist: 1 },
-        { name: "Down 1 mm", id: "Down1", dist: -1 },
-        { name: "Down 10 mm", id: "Down10", dist: -10 },
-        { name: "Down 100 mm", id: "Down100", dist: -100 },
+        { name: "Up 100 mm", id: "Up100", dist: -100 },
+        { name: "Up 10 mm", id: "Up10", dist: -10 },
+        { name: "Up 1 mm", id: "Up1", dist: -1 },
+        { name: "Down 1 mm", id: "Down1", dist: 1 },
+        { name: "Down 10 mm", id: "Down10", dist: 10 },
+        { name: "Down 100 mm", id: "Down100", dist: 100 },
       ];
 
       // Events
@@ -111,22 +111,22 @@
       function displayNudgeButtons() {
         //left side
         for (const nudgeButton of nudgeButtons) {
-          const buttonEl = renderNudgeButton(nudgeButton, "l");
+          const buttonEl = renderNudgeButton(nudgeButton, "left");
           leftNudgeControls.append(buttonEl);
           buttonEl.addEventListener("click", async () => {
             let url = new URL("../nudge", document.baseURI);
-            url.searchParams.append("motor", "l");
+            url.searchParams.append("motor", "left");
             url.searchParams.append("mm", nudgeButton.dist);
             fetch(url);
           });
         }
         //right side
         for (const nudgeButton of nudgeButtons) {
-          const buttonEl = renderNudgeButton(nudgeButton, "r");
+          const buttonEl = renderNudgeButton(nudgeButton, "right");
           rightNudgeControls.append(buttonEl);
           buttonEl.addEventListener("click", async () => {
             let url = new URL("../nudge", document.baseURI);
-            url.searchParams.append("motor", "r");
+            url.searchParams.append("motor", "right");
             url.searchParams.append("mm", nudgeButton.dist);
             fetch(url);
           });

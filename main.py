@@ -32,6 +32,14 @@ def startPrint(request):
     file_manager.start_print()
     return 'Success!', 200
 
+
+@app.route('/nudge')
+def nudge(request):
+    # print(request.args.getlist('motor')[0])
+    print_controller.nudge(side=request.args.getlist('motor')[0], mm=request.args.getlist('mm')[0])
+    return 'woot', 200
+
+
 try:
     print('running')
     ip = connect_wifi()

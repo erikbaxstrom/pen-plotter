@@ -19,9 +19,10 @@ class print_controller:
         self.MAX_INTERP_DIST = 5  # units: mm
         self.width = canvas_width
         self.height = canvas_height
-        self.current_x = 0
-        self.current_y = 0.5 * canvas_width
+        self.current_x = 0.5 * canvas_width
+        self.current_y = 0
         self.steps_per_mm = steps_per_mm
+
         self.left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION)
         self.right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION)
     
@@ -72,14 +73,15 @@ class print_controller:
 
 
 
-# # TEST CODE
+# # # TEST CODE
 
 
 # STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution
-# CANVAS_WIDTH = 600  # units: mm
-# CANVAS_HEIGHT = 600  # units: mm
+# CANVAS_WIDTH = 812  # units: mm (measured as 31 31/32")
+# CANVAS_HEIGHT = 889  # units: mm (measured as 35")
 
-# test_coords = [(300,0), (300,100), (200, 100), (200, 0), (300, 0)]
+# center = CANVAS_WIDTH/2
+# test_coords = [(center,0), (center + 100, 0), (center + 100, 200), (center - 100, 200), (center - 100, 0), (center, 0)]
 # controller = print_controller(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
 
 

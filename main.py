@@ -5,8 +5,8 @@ from print_controller import print_controller
 
 
 STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution
-CANVAS_WIDTH = 600  # units: mm
-CANVAS_HEIGHT = 600  # units: mm
+CANVAS_WIDTH = 812  # units: mm (measured as 31 31/32")
+CANVAS_HEIGHT = 889  # units: mm (measured as 35")
 
 app = Microdot()
 Response.default_content_type = 'text/html'

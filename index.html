@@ -7,6 +7,7 @@
   </head>
   <body>
     <h1>Pen Plotter</h1>
+    <hr />
     <h2>Move</h2>
     <div id="leftNudgeControls">
       <h3>Left Motor</h3>
@@ -15,12 +16,6 @@
     <div id="rightNudgeControls">
       <h3>Right Motor</h3>
     </div>
-    <!-- <button id="leftUp1">Up 1 mm</button>
-    <button id="leftUp10">Up 10 mm</button>
-    <button id="leftUp100">Up 100 mm</button>
-    <button id="leftDown1">Down 1 mm</button>
-    <button id="leftDown10">Down 10 mm</button>
-    <button id="leftDown100">Down 100 mm</button> -->
 
     <hr />
     <h2>Print</h2>
@@ -29,24 +24,18 @@
     <button id="print" disabled="true">Print</button>
 
     <script>
-      // Imports
+      /* Imports  */
       // (none)
 
-      // Get DOM Elements
+      /*  Get DOM Elements  */
       const file = document.getElementById("file");
       const upload = document.getElementById("upload");
       const printButton = document.getElementById("print");
 
       const leftNudgeControls = document.getElementById("leftNudgeControls");
       const rightNudgeControls = document.getElementById("rightNudgeControls");
-      // const leftUp1Button = document.getElementById("leftUp1");
-      // const leftUp10Button = document.getElementById("leftUp10");
-      // const leftUp100Button = document.getElementById("leftUp100");
-      // const leftDown1Button = document.getElementById("leftDown1");
-      // const leftDown10Button = document.getElementById("leftDown10");
-      // const leftDown100Button = document.getElementById("leftDown100");
 
-      // State
+      /*  State  */
       let nudgeButtons = [
         { name: "Up 100 mm", id: "Up100", dist: -100 },
         { name: "Up 10 mm", id: "Up10", dist: -10 },
@@ -56,7 +45,7 @@
         { name: "Down 100 mm", id: "Down100", dist: 100 },
       ];
 
-      // Events
+      /*  Events  */
 
       window.addEventListener("load", async () => {
         displayNudgeButtons();
@@ -94,7 +83,8 @@
               body: fileChunk,
             };
             console.log("payload", payload);
-            await fetch("/upload", payload);
+            let url = new URL("../upload", document.baseURI);
+            await fetch(url, payload);
             printButton.disabled = false;
           }
         };
@@ -103,11 +93,11 @@
       printButton.addEventListener("click", () => {
         event.preventDefault();
         console.log("starting print");
-        printButton.disabled = true;
-        fetch("/print");
+        let url = new URL("../print", document.baseURI);
+        fetch(url);
       });
 
-      // Display Functions
+      /*  Display Functions  */
       function displayNudgeButtons() {
         //left side
         for (const nudgeButton of nudgeButtons) {
@@ -133,7 +123,7 @@
         }
       }
 
-      //Render Utils
+      /*  Render Utils  */
 
       function renderNudgeButton(nudgeButton, side) {
         const button = document.createElement("button");

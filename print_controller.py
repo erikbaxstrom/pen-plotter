@@ -26,6 +26,16 @@ class print_controller:
         self.left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION)
         self.right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION)
     
+    def nudge(self, side, mm):
+        print('nudging nudge', side, mm)
+        steps = int(float(mm) * self.steps_per_mm)
+        print('steps', steps)
+        if side == 'left':
+            self.left_motor.step(steps)
+        if side == 'right':
+            self.right_motor.step(steps)
+        # update current x,y
+        
 
     def execute_gcode(self, code):
         gcodelets = code.split(' ')

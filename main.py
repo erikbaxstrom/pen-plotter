@@ -39,6 +39,11 @@ def nudge(request):
     print_controller.nudge(side=request.args.getlist('motor')[0], mm=request.args.getlist('mm')[0])
     return 'woot', 200
 
+@app.route('/home')
+def go_home(request):
+    print_controller.go_to_home()
+    return 'woohoo', 200
+
 
 try:
     print('running')

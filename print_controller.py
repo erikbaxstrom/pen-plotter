@@ -8,8 +8,8 @@ LEFT_SM_BASE_PIN = 6
 RIGHT_SM_BASE_PIN = 2
 LEFT_SM_NUMBER = 0
 RIGHT_SM_NUMBER = 1
-LEFT_MOTOR_DIRECTION = -1
-RIGHT_MOTOR_DIRECTION = 1
+LEFT_MOTOR_DIRECTION = 1
+RIGHT_MOTOR_DIRECTION = -1
 
 
 class print_controller:
@@ -35,7 +35,16 @@ class print_controller:
         if side == 'right':
             self.right_motor.step(steps)
         # update current x,y
+    #     l = self.left_motor.current_position / self.steps_per_mm
+    #     r = self.right_motor.current_position / self.steps_per_mm
+    #     x, y = self.lr_to_xy(l, r)
+    #     self.current_x = x
+    #     self.current_y = y
         
+    # def lr_to_xy(self, l, r):
+    #     x = sqrt(l)
+    #     y = x
+    #     return x, y
 
     def execute_gcode(self, code):
         gcodelets = code.split(' ')

@@ -8,7 +8,7 @@ class motor_controller:
 
     def __init__(self, base_pin, sm_number, motor_direction):
         print('init state machine. base pin, sm #', base_pin, sm_number)
-        self.pattern = ('1000', '0100', '0010', '0001') * 2
+        self.pattern = ('0001', '0010', '0100', '1000') * 2
         self.motor_direction = motor_direction
         self.current_position = 50038           #int(977 * 2048 / 40)  # center-bottom position is 670 mm length * steps/mm. 
         self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 

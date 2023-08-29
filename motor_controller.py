@@ -6,11 +6,11 @@ from pio_stepper import pio_step
 
 class motor_controller:
 
-    def __init__(self, base_pin, sm_number, motor_direction):
+    def __init__(self, base_pin, sm_number, motor_direction, home_position):
         print('init state machine. base pin, sm #', base_pin, sm_number)
         self.pattern = ('0001', '0010', '0100', '1000') * 2
         self.motor_direction = motor_direction
-        self.current_position = 50038           #int(977 * 2048 / 40)  # center-bottom position is 670 mm length * steps/mm. 
+        self.current_position = home_position
         self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 
         out_base=Pin(base_pin))
         self.sm.irq(self.busy_handler)

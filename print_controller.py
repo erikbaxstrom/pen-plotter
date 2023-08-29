@@ -10,6 +10,8 @@ LEFT_SM_NUMBER = 0
 RIGHT_SM_NUMBER = 1
 LEFT_MOTOR_DIRECTION = 1
 RIGHT_MOTOR_DIRECTION = -1
+LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom position is length * steps/mm. 
+
 
 
 class print_controller:
@@ -23,9 +25,10 @@ class print_controller:
         self.current_y = 0
         self.steps_per_mm = steps_per_mm
 
-        self.left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION)
-        self.right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION)
+        self.left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION)
+        self.right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION)
     
+
     def nudge(self, side, mm):
         print('nudging nudge', side, mm)
         steps = int(float(mm) * self.steps_per_mm)
@@ -34,17 +37,16 @@ class print_controller:
             self.left_motor.step(steps)
         if side == 'right':
             self.right_motor.step(steps)
-        # update current x,y
-    #     l = self.left_motor.current_position / self.steps_per_mm
-    #     r = self.right_motor.current_position / self.steps_per_mm
-    #     x, y = self.lr_to_xy(l, r)
-    #     self.current_x = x
-    #     self.current_y = y
-        
-    # def lr_to_xy(self, l, r):
-    #     x = sqrt(l)
-    #     y = x
-    #     return x, y
+        # set current position as home
+        self.current_x = 0.5 * self.width
+        self.current_y = 0
+        self.left_motor.current_position = LEFT_MOTOR_HOME_POSITION
+        self.right_motor.current_position = RIGHT_MOTOR_HOME_POSITION
+
+
+    def go_to_home(self):
+        self.move_to_coord(0.5 * self.width, 0)
+
 
     def execute_gcode(self, code):
         gcodelets = code.split(' ')
@@ -80,7 +82,7 @@ class print_controller:
             while self.left_motor.is_busy or self.right_motor.is_busy:
                 print('not ready: left, right', self.left_motor.is_busy, self.right_motor.is_busy)
                 sleep(1)
-
+                
         self.current_x = x
         self.current_y = y
 

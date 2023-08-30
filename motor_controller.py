@@ -15,27 +15,38 @@ class motor_controller:
         out_base=Pin(base_pin))
         self.sm.irq(self.busy_handler)
         self.is_busy = False
-        self.sm.active(1)
+        self.enabled = False
 
     @property
-    def is_busy(self):
-        return self._is_busy
+    def enabled(self):
+        return self._enabled
     
-    @is_busy.setter
-    def is_busy(self, value):
-        self._is_busy = value
+    @enabled.setter
+    def enabled(self, value):
+        try:
+            if not self._enabled and value is True:
+                self.sm.active(1)
+                self._enabled = value
+            if self._enabled and value is False:
+                self.sm.exec("set(pins,0)")
+                self.sm.active(0)
+                self._enabled = value
+        except AttributeError:  # when first called, it's not yet set
+            self._enabled = value
 
-    @is_busy.getter
-    def is_busy(self):
-        return self._is_busy
+    @enabled.getter
+    def enabled(self):
+        return self._enabled
 
 
     def busy_handler(self, sm):
         print('handler running with is_busy = ', self.is_busy)
         self.is_busy = False
 
+
     def step(self, steps):
         self.is_busy = True
+        self.enabled = True
         steps *= self.motor_direction
         pattern = self.pattern
         if steps < 0:
@@ -54,9 +65,8 @@ class motor_controller:
         self.current_position = position
 
 
-    def deactivate(self):
-        self.sm.exec("set(pins,0)")
-        self.sm.active(0)
+ 
+
 
 
         # adjust index

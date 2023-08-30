@@ -18,30 +18,36 @@ def index(request):
     response = send_file('index.html')
     return response
 
-@app.route('/upload', methods=['POST'])
+
+@app.route('/api/v1/upload', methods=['POST'])
 def fileUpload(request):
     # print('Content-Range, Disposition', request.headers['Content-Range'], request.headers['Content-Disposition'])
     file_manager.add_to_print_file(request.body)
     blah = request.body
     return 'Success!', 200
 
-
-@app.route('/print')
+@app.route('/api/v1/print')
 def startPrint(request):
     print('print route called')
     file_manager.start_print()
     return 'Success!', 200
 
-
-@app.route('/nudge')
+@app.route('/api/v1/nudge')
 def nudge(request):
     # print(request.args.getlist('motor')[0])
     print_controller.nudge(side=request.args.getlist('motor')[0], mm=request.args.getlist('mm')[0])
     return 'woot', 200
 
-@app.route('/home')
+@app.route('/api/v1/go-home')
 def go_home(request):
     print_controller.go_to_home()
+    return 'woohoo', 200
+
+@app.route('/api/v1/motors-active')
+def deactivate_motors(request):
+    print('req arg', request.args.getlist('active')[0], bool(request.args.getlist('active')[0]))
+    if request.args.getlist('active')[0] == "false":
+        print_controller.deactivate_motors()
     return 'woohoo', 200
 
 

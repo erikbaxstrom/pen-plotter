@@ -10,12 +10,16 @@
     <hr />
     <h2>Move</h2>
     <div id="leftNudgeControls">
-      <h3>Left Motor</h3>
+      <h3>Left Motor -- Move and Set New Home</h3>
     </div>
 
     <div id="rightNudgeControls">
-      <h3>Right Motor</h3>
+      <h3>Right Motor -- Move and Set New Home</h3>
     </div>
+
+    <h3>Other</h3>
+    <button id="goHome">Move to Home Position</button>
+    <button id="deactivateMotors">Deactivate Motors</button>
 
     <hr />
     <h2>Print</h2>
@@ -34,6 +38,8 @@
 
       const leftNudgeControls = document.getElementById("leftNudgeControls");
       const rightNudgeControls = document.getElementById("rightNudgeControls");
+      const goHomeButton = document.getElementById("goHome");
+      const deactivateButton = document.getElementById("deactivateMotors");
 
       /*  State  */
       let nudgeButtons = [
@@ -83,7 +89,7 @@
               body: fileChunk,
             };
             console.log("payload", payload);
-            let url = new URL("../upload", document.baseURI);
+            let url = new URL("../api/v1/upload", document.baseURI);
             await fetch(url, payload);
             printButton.disabled = false;
           }
@@ -93,7 +99,19 @@
       printButton.addEventListener("click", () => {
         event.preventDefault();
         console.log("starting print");
-        let url = new URL("../print", document.baseURI);
+        let url = new URL("../api/v1/print", document.baseURI);
+        fetch(url);
+      });
+
+      goHomeButton.addEventListener("click", () => {
+        event.preventDefault();
+        let url = new URL("../api/v1/go-home", document.baseURI);
+        fetch(url);
+      });
+
+      deactivateButton.addEventListener("click", () => {
+        let url = new URL("../api/v1/motors-active", document.baseURI);
+        url.searchParams.append("active", false);
         fetch(url);
       });
 
@@ -104,7 +122,7 @@
           const buttonEl = renderNudgeButton(nudgeButton, "left");
           leftNudgeControls.append(buttonEl);
           buttonEl.addEventListener("click", async () => {
-            let url = new URL("../nudge", document.baseURI);
+            let url = new URL("../api/v1/nudge", document.baseURI);
             url.searchParams.append("motor", "left");
             url.searchParams.append("mm", nudgeButton.dist);
             fetch(url);
@@ -115,7 +133,7 @@
           const buttonEl = renderNudgeButton(nudgeButton, "right");
           rightNudgeControls.append(buttonEl);
           buttonEl.addEventListener("click", async () => {
-            let url = new URL("../nudge", document.baseURI);
+            let url = new URL("../api/v1/nudge", document.baseURI);
             url.searchParams.append("motor", "right");
             url.searchParams.append("mm", nudgeButton.dist);
             fetch(url);

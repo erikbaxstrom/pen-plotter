@@ -3,7 +3,7 @@ from time import sleep
 from machine import Pin
 from rp2 import StateMachine, PIO
 
-from pstep import pio_step
+from piostep import pio_step
 
 
 class MotorController:

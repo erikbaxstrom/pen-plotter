@@ -16,6 +16,19 @@ LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom p
 
 
 class PrintController:
+    """Controls the print head position and prints gcode strings.
+
+    Args:
+        canvas_width (float): Width of the canvas in mm.
+        canvas_height (float): Height of the canvas in mm.
+        steps_per_mm (float): Number of motor steps per millimeter of travel.
+
+    Attributes:
+        home_coords (tuple)(float, float): Coordinates for the home position.
+        current_x (float): Current x-coordinate.
+        current_y (float): Current y-coordinate.
+        steps_per_mm (float): Number of motor steps per millimeter of travel.
+    """
 
     def __init__(self, canvas_width, canvas_height, steps_per_mm):
         self.MAX_INTERP_DIST = 5  # units: mm
@@ -30,6 +43,12 @@ class PrintController:
     
 
     def nudge(self, side, mm):
+        """Nudge the print head position by changing the left or right belt lengths.
+
+        Args:
+            side (str): Side to nudge ('left' or 'right').
+            mm (float): Change in belt length in millimeters.
+        """
         print('nudging nudge', side, mm)
         steps = int(float(mm) * self.steps_per_mm)
         print('steps', steps)
@@ -41,12 +60,14 @@ class PrintController:
 
 
     def set_new_home(self):
+        """Set the current position as the home position for the print head."""
         self.current_x , self.current_y = self.home_coords
         self.left_motor.current_position = LEFT_MOTOR_HOME_POSITION
         self.right_motor.current_position = RIGHT_MOTOR_HOME_POSITION
 
 
     def go_to_home(self):
+        """Move print head to home position."""
         self.move_to_coord(self.home_coords[0], self.home_coords[1])
         while self.left_motor.is_busy or self.right_motor.is_busy:
             sleep(1)
@@ -54,6 +75,12 @@ class PrintController:
         
 
     def print_gcode(self, string):
+        """Print a string of G-code commands.
+
+        Args:
+            string (str): G-code commands separated by newline characters.
+        """
+        
         for code in string.split('\n'):
             print('processing code', code)
             self.execute_gcode(code)
@@ -61,6 +88,12 @@ class PrintController:
 
 
     def execute_gcode(self, code):
+        """Execute a single G-code command.
+
+        Args:
+            code (str): G-code command.
+        """
+
         gcodelets = code.split(' ')
         command = gcodelets[0]
         if command == ';':
@@ -77,7 +110,13 @@ class PrintController:
         
 
     def move_to_coord(self, x, y):
-        # interpolate
+        """Move the print head to the specified x, y coordinate.
+        Args:
+            x (float): X-coordinate.
+            y (float): Y-coordinate.
+        """
+
+        # TODO: interpolate
         interpolated_coordinates = [(x,y)]
         # iterate through interpolated points 
         for x, y in interpolated_coordinates:
@@ -100,6 +139,7 @@ class PrintController:
 
 
     def deactivate_motors(self):
+        """Deactivate both left and right motors."""
         self.left_motor.enabled = False
         self.right_motor.enabled = False
 

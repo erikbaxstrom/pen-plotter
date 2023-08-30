@@ -1,10 +1,12 @@
+from time import sleep
+
 from machine import Pin
 from rp2 import StateMachine, PIO
-from time import sleep
-from pio_stepper import pio_step
+
+from pstep import pio_step
 
 
-class motor_controller:
+class MotorController:
 
     def __init__(self, base_pin, sm_number, motor_direction, home_position):
         print('init state machine. base pin, sm #', base_pin, sm_number)
@@ -38,11 +40,9 @@ class motor_controller:
     def enabled(self):
         return self._enabled
 
-
     def busy_handler(self, sm):
         print('handler running with is_busy = ', self.is_busy)
         self.is_busy = False
-
 
     def step(self, steps):
         self.is_busy = True
@@ -56,7 +56,6 @@ class motor_controller:
         self.sm.put(steps)
         self.sm.put(bitmask)
         print('done put steps, bitmask', bitmask, steps)
-    
 
     def step_to(self, position):
         print('step_to position', position)
@@ -117,4 +116,3 @@ class motor_controller:
 #     sleep(1)
 # left_motor.deactivate()
 # right_motor.deactivate()
-   

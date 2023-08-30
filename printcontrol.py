@@ -1,7 +1,9 @@
 from math import sqrt
-from machine import Pin
 from time import sleep
-from motor_controller import motor_controller
+
+from machine import Pin
+
+from motorcontrol import MotorController
 
 
 LEFT_SM_BASE_PIN = 6
@@ -13,9 +15,7 @@ RIGHT_MOTOR_DIRECTION = -1
 LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom position is length * steps/mm. 
 
 
-
-class print_controller:
-
+class PrintController:
 
     def __init__(self, canvas_width, canvas_height, steps_per_mm):
         self.MAX_INTERP_DIST = 5  # units: mm
@@ -25,8 +25,8 @@ class print_controller:
         self.current_x, self.current_y = self.home_coords
         self.steps_per_mm = steps_per_mm
 
-        self.left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION)
-        self.right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION)
+        self.left_motor = MotorController(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION)
+        self.right_motor = MotorController(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION)
     
 
     def nudge(self, side, mm):
@@ -123,5 +123,3 @@ class print_controller:
 #     controller.move_to_coord(coord[0], coord[1])
 
 # controller.finish_print()
-        
-

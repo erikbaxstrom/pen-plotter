@@ -1,8 +1,8 @@
-from connection_manager import connect_wifi
 from microdot import Microdot, Response, send_file
 
 from filemanager import FileManager
 from printcontrol import PrintController
+from connectionmanager import connect_wifi
 
 
 STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution

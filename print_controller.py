@@ -21,8 +21,8 @@ class print_controller:
         self.MAX_INTERP_DIST = 5  # units: mm
         self.width = canvas_width
         self.height = canvas_height
-        self.current_x = 0.5 * canvas_width
-        self.current_y = 0
+        self.home_coords = (0.5 * canvas_width, 0)
+        self.current_x, self.current_y = self.home_coords
         self.steps_per_mm = steps_per_mm
 
         self.left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION)
@@ -37,28 +37,41 @@ class print_controller:
             self.left_motor.step(steps)
         if side == 'right':
             self.right_motor.step(steps)
-        # set current position as home
-        self.current_x = 0.5 * self.width
-        self.current_y = 0
+        self.set_new_home()
+
+
+    def set_new_home(self):
+        self.current_x , self.current_y = self.home_coords
         self.left_motor.current_position = LEFT_MOTOR_HOME_POSITION
         self.right_motor.current_position = RIGHT_MOTOR_HOME_POSITION
 
 
     def go_to_home(self):
-        self.move_to_coord(0.5 * self.width, 0)
+        self.move_to_coord(self.home_coords[0], self.home_coords[1])
+        while self.left_motor.is_busy or self.right_motor.is_busy:
+            sleep(1)
+        self.deactivate_motors()
+        
+
+    def print_gcode(self, string):
+        for code in string.split('\n'):
+            print('processing code', code)
+            self.execute_gcode(code)
+        self.deactivate_motors()
 
 
     def execute_gcode(self, code):
         gcodelets = code.split(' ')
         command = gcodelets[0]
+        if command == ';':
+            print('passing over a ;comment', code)
+            return
         if command == 'G1':
             print('found a g1 code, will print now', code)
             x = gcodelets[2][1:]
             y = gcodelets[3][1:]
-            print('converting strings', x, y)
             x = float(x)
             y = float(y)
-            print('as floats', x, y)
             self.move_to_coord(x, y)
             return
         
@@ -78,7 +91,6 @@ class print_controller:
             # output stepper positions to the stepper motors
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
-
             while self.left_motor.is_busy or self.right_motor.is_busy:
                 print('not ready: left, right', self.left_motor.is_busy, self.right_motor.is_busy)
                 sleep(1)
@@ -87,9 +99,9 @@ class print_controller:
         self.current_y = y
 
 
-    def finish_print(self):
-        self.left_motor.deactivate()
-        self.right_motor.deactivate()
+    def deactivate_motors(self):
+        self.left_motor.enabled = False
+        self.right_motor.enabled = False
 
 
 

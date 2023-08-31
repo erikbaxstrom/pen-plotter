@@ -116,8 +116,8 @@ class MotorController:
 
 
 
-# this should live in motor_controller 
 
+# # TEST CODE
 
 # # init the state machine 
 # LEFT_SM_BASE_PIN = 6
@@ -127,24 +127,24 @@ class MotorController:
 # LEFT_MOTOR_DIRECTION = -1
 # RIGHT_MOTOR_DIRECTION = 1
 
-# left_motor = motor_controller(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION)
-# right_motor = motor_controller(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION)
+# left_motor = MotorController(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, 0)
+# right_motor = MotorController(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION, 0)
 # # sleep(1)
 
 
 # # run a test sequence (run steps, wait, run more steps, wait, run negative steps)
 # # steps = [(2048, 0), (0, 0), (0, 0)]
 # blah = 2048 * 5
-# steps = [(blah, 0), (0,0)]
+# steps = [(blah, blah), (-blah, -blah)]
 
 # for step in steps:
 #     while left_motor.is_busy or right_motor.is_busy:
-#         print('not ready: left, right', left_motor.is_busy, right_motor.is_busy)
-#         sleep(30)
+#         # print('not ready: left, right', left_motor.is_busy, right_motor.is_busy)
+#         sleep(0.1)
 #     print('calling steps', step[0], step[1])
-#     left_motor.step_to(step[0])
-#     right_motor.step_to(step[1])
+#     left_motor.step(step[0])
+#     right_motor.step(step[1])
 # while left_motor.is_busy or right_motor.is_busy:
 #     sleep(1)
-# left_motor.deactivate()
-# right_motor.deactivate()
+# left_motor.enabled = False
+# right_motor.enabled = False

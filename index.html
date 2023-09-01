@@ -6,14 +6,56 @@
     <title>Pen Plotter</title>
   </head>
   <body>
+    <h1>Pen Plotter</h1>
+    <hr />
+    <h2>Move</h2>
+    <div id="leftNudgeControls">
+      <h3>Left Motor -- Move and Set New Home</h3>
+    </div>
+
+    <div id="rightNudgeControls">
+      <h3>Right Motor -- Move and Set New Home</h3>
+    </div>
+
+    <h3>Other</h3>
+    <button id="goHome">Move to Home Position</button>
+    <button id="deactivateMotors">Deactivate Motors</button>
+
+    <hr />
+    <h2>Print</h2>
     <input type="file" id="file" name="name" />
     <button id="upload">Upload gcode</button>
     <button id="print" disabled="true">Print</button>
 
     <script>
+      /* Imports  */
+      // (none)
+
+      /*  Get DOM Elements  */
       const file = document.getElementById("file");
       const upload = document.getElementById("upload");
       const printButton = document.getElementById("print");
+
+      const leftNudgeControls = document.getElementById("leftNudgeControls");
+      const rightNudgeControls = document.getElementById("rightNudgeControls");
+      const goHomeButton = document.getElementById("goHome");
+      const deactivateButton = document.getElementById("deactivateMotors");
+
+      /*  State  */
+      let nudgeButtons = [
+        { name: "Up 100 mm", id: "Up100", dist: -100 },
+        { name: "Up 10 mm", id: "Up10", dist: -10 },
+        { name: "Up 1 mm", id: "Up1", dist: -1 },
+        { name: "Down 1 mm", id: "Down1", dist: 1 },
+        { name: "Down 10 mm", id: "Down10", dist: 10 },
+        { name: "Down 100 mm", id: "Down100", dist: 100 },
+      ];
+
+      /*  Events  */
+
+      window.addEventListener("load", async () => {
+        displayNudgeButtons();
+      });
 
       upload.addEventListener("click", () => {
         event.preventDefault();
@@ -47,7 +89,8 @@
               body: fileChunk,
             };
             console.log("payload", payload);
-            await fetch("/upload", payload);
+            let url = new URL("../api/v1/upload", document.baseURI);
+            await fetch(url, payload);
             printButton.disabled = false;
           }
         };
@@ -56,9 +99,56 @@
       printButton.addEventListener("click", () => {
         event.preventDefault();
         console.log("starting print");
-        printButton.disabled = true;
-        fetch("/print");
+        let url = new URL("../api/v1/print", document.baseURI);
+        fetch(url);
       });
+
+      goHomeButton.addEventListener("click", () => {
+        event.preventDefault();
+        let url = new URL("../api/v1/go-home", document.baseURI);
+        fetch(url);
+      });
+
+      deactivateButton.addEventListener("click", () => {
+        let url = new URL("../api/v1/motors-active", document.baseURI);
+        url.searchParams.append("active", false);
+        fetch(url);
+      });
+
+      /*  Display Functions  */
+      function displayNudgeButtons() {
+        //left side
+        for (const nudgeButton of nudgeButtons) {
+          const buttonEl = renderNudgeButton(nudgeButton, "left");
+          leftNudgeControls.append(buttonEl);
+          buttonEl.addEventListener("click", async () => {
+            let url = new URL("../api/v1/nudge", document.baseURI);
+            url.searchParams.append("motor", "left");
+            url.searchParams.append("mm", nudgeButton.dist);
+            fetch(url);
+          });
+        }
+        //right side
+        for (const nudgeButton of nudgeButtons) {
+          const buttonEl = renderNudgeButton(nudgeButton, "right");
+          rightNudgeControls.append(buttonEl);
+          buttonEl.addEventListener("click", async () => {
+            let url = new URL("../api/v1/nudge", document.baseURI);
+            url.searchParams.append("motor", "right");
+            url.searchParams.append("mm", nudgeButton.dist);
+            fetch(url);
+          });
+        }
+      }
+
+      /*  Render Utils  */
+
+      function renderNudgeButton(nudgeButton, side) {
+        const button = document.createElement("button");
+        button.id = side + nudgeButton.id;
+        button.textContent = nudgeButton.name;
+        return button;
+      }
     </script>
   </body>
 </html>

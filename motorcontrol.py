@@ -25,13 +25,13 @@ class MotorController:
 
     """
 
-    def __init__(self, base_pin, sm_number, motor_direction, home_position):
-        print('init state machine. base pin, sm #', base_pin, sm_number)
+    def __init__(self, motor_direction, home_position, state_machine):
         self.pattern = ('0001', '0010', '0100', '1000') * 2
         self.motor_direction = motor_direction
         self.current_position = home_position
-        self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 
-        out_base=Pin(base_pin))
+        # self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 
+        # out_base=Pin(base_pin))
+        self.sm = state_machine
         self.sm.irq(self.busy_handler)
         self.is_busy = False
         self.enabled = False

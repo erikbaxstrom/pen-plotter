@@ -1,17 +1,12 @@
 from math import sqrt
 from time import sleep
 
-from machine import Pin
-
-from motorcontrol import MotorController
-
-
-LEFT_SM_BASE_PIN = 6
-RIGHT_SM_BASE_PIN = 2
-LEFT_SM_NUMBER = 0
-RIGHT_SM_NUMBER = 1
-LEFT_MOTOR_DIRECTION = 1
-RIGHT_MOTOR_DIRECTION = -1
+# LEFT_SM_BASE_PIN = 6
+# RIGHT_SM_BASE_PIN = 2
+# LEFT_SM_NUMBER = 0
+# RIGHT_SM_NUMBER = 1
+# LEFT_MOTOR_DIRECTION = 1
+# RIGHT_MOTOR_DIRECTION = -1
 LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom position is length * steps/mm. 
 
 
@@ -30,7 +25,7 @@ class PrintController:
         steps_per_mm (float): Number of motor steps per millimeter of travel.
     """
 
-    def __init__(self, canvas_width, canvas_height, steps_per_mm):
+    def __init__(self, canvas_width, canvas_height, steps_per_mm, left_motor, right_motor):
         self.MAX_INTERP_DIST = 5  # units: mm
         self.width = canvas_width
         self.height = canvas_height
@@ -38,8 +33,9 @@ class PrintController:
         self.current_x, self.current_y = self.home_coords
         self.steps_per_mm = steps_per_mm
 
-        self.left_motor = MotorController(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION)
-        self.right_motor = MotorController(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION)
+
+        self.left_motor = left_motor
+        self.right_motor = right_motor
     
 
     def nudge(self, side, mm):
@@ -74,7 +70,8 @@ class PrintController:
         self.deactivate_motors()
         
 
-    def print_gcode(self, string):
+    # move to print manger class
+    def print_gcode(self, string): 
         """Print a string of G-code commands.
 
         Args:

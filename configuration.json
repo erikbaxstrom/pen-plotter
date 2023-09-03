@@ -1,54 +1,62 @@
 {
   "Print Area Settings": {
-    "canvas_width": {
-      "value": 610,
+    "Canvas Width": {
+      "value": 812,
       "description": "Width of drawable area in mm"
     },
-    "canvas_height": {
-      "value": 762,
+    "Canvas Height": {
+      "value": 889,
       "description": "Height of drawable area in mm"
     },
-    "canvas_margin_top": {
+    "Canvas Margin Top": {
       "value": 254,
       "description": "Vertical distance from motor pulleys to the top of the canvas in mm"
     },
-    "width_pulley_to_pulley": {
+    "Width Pulley to Pulley": {
       "value": 812,
       "description": "Distance from pulley center to pulley center in mm"
     },
-    "interpolation_length": {
+    "Interpolation Distance": {
       "value": 5,
       "description": "Maximum distance gondola will travel before recalculating trajectory to final x,y destination"
     }
   },
   "Stepper Motor Settings": {
-    "steps_per_mm": {
+    "Steps Per mm": {
       "value": 51.2,
       "description": "Motor steps per mm of belt movement"
     },
-    "left_motor_direction": {
+    "Left Motor Direction": {
       "value": 1,
       "description": "Direction of Left motor to lower the gondola. 1:clockwise, -1: counterclockwise"
     },
-    "right_motor_direction": {
+    "Right Motor Direction": {
       "value": -1,
       "description": "Direction of Right motor to lower the gondola. 1:clockwise, -1: counterclockwise"
+    },
+    "Left Motor Home Position": {
+      "value": 50038,
+      "description": "??"
+    },
+    "Right Motor Home Position": {
+      "value": 50038,
+      "description": "??"
     }
   },
   "Pin Out and PIO Settings": {
-    "left_sm_pin": {
+    "Left State Machine Base Pin": {
       "value": 12345,
       "description": "GPIO Pin connected to Left stepper motor driver (ULN2003) Pin 1"
     },
-    "right_sm_pin": {
+    "Right State Machine Base Pin": {
       "value": 12345,
       "description": "GPIO Pin connected to Right stepper motor driver (ULN2003) Pin 1"
     },
-    "left_sm_number": {
+    "Left State Machine Number": {
       "value": 1234,
       "description": "Index for state machine controlling Left motor"
     },
-    "right_sm_number": {
+    "Right State Machine Number": {
       "value": 1234,
       "description": "Index for state machine controlling Right motor"
     }

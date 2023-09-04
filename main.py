@@ -61,11 +61,10 @@ def go_home(request):
     print_controller.go_to_home()
     return 'woohoo', 200
 
-@app.route('/api/v1/motors-active')
+@app.route('/api/v1/hard-stop')
 def deactivate_motors(request):
-    print('req arg', request.args.getlist('active')[0], bool(request.args.getlist('active')[0]))
-    if request.args.getlist('active')[0] == "false":
-        print_controller.hard_stop_motors()
+    # print('req arg', request.args.getlist('active')[0], bool(request.args.getlist('active')[0]))
+    print_controller.hard_stop_motors()
     return 'woohoo', 200
 
 

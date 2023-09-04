@@ -7,25 +7,25 @@
   </head>
   <body>
     <h1>Pen Plotter</h1>
-    <hr />
-    <h2>Move</h2>
-    <div id="leftNudgeControls">
-      <h3>Left Motor -- Move and Set New Home</h3>
-    </div>
-
-    <div id="rightNudgeControls">
-      <h3>Right Motor -- Move and Set New Home</h3>
-    </div>
-
-    <h3>Other</h3>
-    <button id="goHome">Move to Home Position</button>
-    <button id="deactivateMotors">Deactivate Motors</button>
 
     <hr />
     <h2>Print</h2>
+    <button id="goHome">Move to Home Position</button>
     <input type="file" id="file" name="name" />
     <button id="upload">Upload gcode</button>
     <button id="print" disabled="true">Print</button>
+    <hr />
+    <h2>Set Home Position</h2>
+    <div id="leftNudgeControls">
+      <h3>Left Motor</h3>
+    </div>
+
+    <div id="rightNudgeControls">
+      <h3>Right Motor</h3>
+    </div>
+
+    <h3>Stop</h3>
+    <button id="hardStopMotors">Stop Motors</button>
 
     <script>
       /* Imports  */
@@ -39,7 +39,7 @@
       const leftNudgeControls = document.getElementById("leftNudgeControls");
       const rightNudgeControls = document.getElementById("rightNudgeControls");
       const goHomeButton = document.getElementById("goHome");
-      const deactivateButton = document.getElementById("deactivateMotors");
+      const hardStopMotorsButton = document.getElementById("hardStopMotors");
 
       /*  State  */
       let nudgeButtons = [
@@ -109,9 +109,8 @@
         fetch(url);
       });
 
-      deactivateButton.addEventListener("click", () => {
-        let url = new URL("../api/v1/motors-active", document.baseURI);
-        url.searchParams.append("active", false);
+      hardStopMotorsButton.addEventListener("click", () => {
+        let url = new URL("../api/v1/hard-stop", document.baseURI);
         fetch(url);
       });
 

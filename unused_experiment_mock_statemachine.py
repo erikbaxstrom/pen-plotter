@@ -27,6 +27,10 @@ class MockStateMachine:
     def exec(self, command):
         self.result.append(f"{self.id} exec {command}")
 
+    def tail(self, lines=0):
+        if lines == 0:
+            return self.result
+        return self.result[-lines:]
     
 
 

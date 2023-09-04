@@ -31,7 +31,7 @@ right_motor = MotorController(RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION, 
 
 printer_geometry = PrinterGeometry(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
 
-print_controller = PrintController(CANVAS_WIDTH, left_motor, right_motor, printer_geometry)
+print_controller = PrintController(left_motor, right_motor, printer_geometry)
 file_manager = FileManager(print_controller)
 
 

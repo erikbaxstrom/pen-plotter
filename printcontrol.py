@@ -19,7 +19,7 @@ class PrintController:
         steps_per_mm (float): Number of motor steps per millimeter of travel.
     """
 
-    def __init__(self, canvas_width, left_motor, right_motor, printer_geometry):
+    def __init__(self, left_motor, right_motor, printer_geometry):
         self.geometry = printer_geometry
         self.left_motor = left_motor
         self.right_motor = right_motor

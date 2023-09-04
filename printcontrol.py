@@ -1,12 +1,6 @@
 from math import sqrt
 from time import sleep
 
-# LEFT_SM_BASE_PIN = 6
-# RIGHT_SM_BASE_PIN = 2
-# LEFT_SM_NUMBER = 0
-# RIGHT_SM_NUMBER = 1
-# LEFT_MOTOR_DIRECTION = 1
-# RIGHT_MOTOR_DIRECTION = -1
 LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom position is length * steps/mm. 
 
 
@@ -115,11 +109,10 @@ class PrintController:
         # iterate through interpolated points 
         for x, y in interpolated_coordinates:
             # convert interpolated coordinates (mm) to belt lengths (mm)
-            l_length = sqrt((x**2 + (self.height - y)**2 ))
-            r_length = sqrt(((self.width - x)**2 + (self.height - y)**2 ))
+            l_length, r_length = self.xy_to_lr(x, y)
             # convert belt lengths (mm) to stepper positions (steps)
-            l_step_pos = int(l_length * self.steps_per_mm)
-            r_step_pos = int(r_length * self.steps_per_mm)
+            l_step_pos, r_step_pos = self.length_to_step_position(l_length, r_length)
+
             print("interpolated coordinates (mm)", x, y,  "to belt lengths (mm)", l_length, r_length, "to stepper positions", l_step_pos, r_step_pos)
             # output stepper positions to the stepper motors
             self.left_motor.step_to(l_step_pos)
@@ -130,6 +123,16 @@ class PrintController:
                 
         self.current_x = x
         self.current_y = y
+
+    def xy_to_lr(self, x, y):
+            l_length = sqrt((x**2 + (self.height - y)**2 ))
+            r_length = sqrt(((self.width - x)**2 + (self.height - y)**2 ))
+            return l_length, r_length
+
+    def length_to_step_position(self, l_length, r_length):
+            l_step_pos = int(l_length * self.steps_per_mm)
+            r_step_pos = int(r_length * self.steps_per_mm)
+            return l_step_pos, r_step_pos
 
 
     def deactivate_motors(self):

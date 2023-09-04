@@ -7,7 +7,7 @@ from connectionmanager import connect_wifi
 from filemanager import FileManager
 from motorcontrol import MotorController
 from piostep import pio_step
-from printcontrol import PrintController
+from printcontrol import PrintController, PrinterGeometry
 
 
 
@@ -51,8 +51,9 @@ def startPrint(request):
 
 @app.route('/api/v1/nudge')
 def nudge(request):
-    # print(request.args.getlist('motor')[0])
-    print_controller.nudge(side=request.args.getlist('motor')[0], mm=request.args.getlist('mm')[0])
+    side = request.args.getlist('motor')[0]
+    mm = float(request.args.getlist('mm')[0])
+    print_controller.nudge(side, mm)
     return 'woot', 200
 
 @app.route('/api/v1/go-home')
@@ -74,7 +75,8 @@ right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(RIGH
 left_motor = MotorController(LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION, left_sm)
 right_motor = MotorController(RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION, right_sm)
 
-print_controller = PrintController(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM, left_motor, right_motor)
+printer_geometry = PrinterGeometry(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
+print_controller = PrintController(left_motor, right_motor, printer_geometry)
 file_manager = FileManager(print_controller)
 
 try:

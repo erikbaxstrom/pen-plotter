@@ -20,12 +20,11 @@ class PrintController:
     """
 
     def __init__(self, canvas_width, left_motor, right_motor, printer_geometry):
-        self.MAX_INTERP_DIST = 5  # units: mm
-        self.home_coords = (0.5 * canvas_width, 0)
-        self.current_x, self.current_y = self.home_coords
         self.geometry = printer_geometry
         self.left_motor = left_motor
         self.right_motor = right_motor
+        self.current_x = self.geometry.home_x
+        self.current_y = self.geometry.home_y
     
 
     def nudge(self, side, mm):
@@ -46,14 +45,15 @@ class PrintController:
 
     def set_new_home(self):
         """Set the current position as the home position for the print head."""
-        self.current_x , self.current_y = self.home_coords
+        self.current_x = self.geometry.home_x
+        self.current_y = self.geometry.home_y
         self.left_motor.current_position = LEFT_MOTOR_HOME_POSITION
         self.right_motor.current_position = RIGHT_MOTOR_HOME_POSITION
 
 
     def go_to_home(self):
         """Move print head to home position."""
-        self.move_to_coord(self.home_coords[0], self.home_coords[1])
+        self.move_to_coord(self.geometry.home_x, self.geometry.home_y)
         while self.left_motor.is_busy or self.right_motor.is_busy:
             sleep(1)
         self.deactivate_motors()
@@ -131,6 +131,8 @@ class PrinterGeometry:
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
         self.steps_per_mm = steps_per_mm
+        self.home_x = 0.5 * canvas_width
+        self.home_y = 0
 
     def xy_to_step_positions(self, x, y):
         l_length = sqrt((x**2 + (self.canvas_height - y)**2 ))

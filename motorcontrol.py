@@ -48,6 +48,9 @@ class MotorController:
     def enabled(self):
         return self._enabled
 
+    def reset(self):
+        self.sm.restart()
+
     def set_home(self, position=None):
         if position is None:
             position = self.home_position

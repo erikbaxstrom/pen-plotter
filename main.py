@@ -65,7 +65,7 @@ def go_home(request):
 def deactivate_motors(request):
     print('req arg', request.args.getlist('active')[0], bool(request.args.getlist('active')[0]))
     if request.args.getlist('active')[0] == "false":
-        print_controller.deactivate_motors()
+        print_controller.hard_stop_motors()
     return 'woohoo', 200
 
 

@@ -114,7 +114,11 @@ class PrintController:
         self.left_motor.enabled = False
         self.right_motor.enabled = False
 
-
+    def hard_stop_motors(self):
+        self.deactivate_motors()
+        self.left_motor.reset()
+        self.right_motor.reset()
+        
 
 class PrinterGeometry:
     """Geometry for the printer

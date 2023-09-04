@@ -1,11 +1,3 @@
-from time import sleep
-
-from machine import Pin
-from rp2 import StateMachine, PIO
-
-from piostep import pio_step
-
-
 class MotorController:
     """Controls a stepper motor
 
@@ -28,9 +20,8 @@ class MotorController:
     def __init__(self, motor_direction, home_position, state_machine):
         self.pattern = ('0001', '0010', '0100', '1000') * 2
         self.motor_direction = motor_direction
+        self.home_position = home_position
         self.current_position = home_position
-        # self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 
-        # out_base=Pin(base_pin))
         self.sm = state_machine
         self.sm.irq(self.busy_handler)
         self.is_busy = False
@@ -56,6 +47,11 @@ class MotorController:
     @enabled.getter
     def enabled(self):
         return self._enabled
+
+    def set_home(self, position=None):
+        if position is None:
+            position = self.home_position
+        self.current_position = position
 
     def busy_handler(self, sm):
         """Handler for PIO interrupts indicating completion of state machine output"""
@@ -89,8 +85,7 @@ class MotorController:
         Args:
             position (int): Target position.
         """
-
-        # print('step_to position', position)
+        
         rel_steps = position - self.current_position
         self.step(rel_steps)
         self.current_position = position
@@ -118,6 +113,13 @@ class MotorController:
 
 
 # # TEST CODE
+
+# from time import sleep
+
+# from machine import Pin
+# from rp2 import StateMachine, PIO
+
+# from piostep import pio_step
 
 # # init the state machine 
 # LEFT_SM_BASE_PIN = 6

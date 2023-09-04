@@ -1,8 +1,6 @@
 from math import sqrt
 from time import sleep
 
-LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom position is length * steps/mm. 
-
 
 class PrintController:
     """Controls the print head position and prints gcode strings.
@@ -47,8 +45,8 @@ class PrintController:
         """Set the current position as the home position for the print head."""
         self.current_x = self.geometry.home_x
         self.current_y = self.geometry.home_y
-        self.left_motor.current_position = LEFT_MOTOR_HOME_POSITION
-        self.right_motor.current_position = RIGHT_MOTOR_HOME_POSITION
+        self.left_motor.set_home()
+        self.right_motor.set_home()
 
 
     def go_to_home(self):

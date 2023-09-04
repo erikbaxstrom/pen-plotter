@@ -74,6 +74,8 @@ G1 F2300.0 X350 Y0 Z-3.3
     print_controller.nudge(side='left', mm=-20)
     print_controller.nudge(side='right', mm=-20)
     sleep(5)
+    print_controller.go_to_home()
+    sleep(5)
     print_controller.nudge(side='left', mm=20)
     print_controller.nudge(side='right', mm=20)
     sleep(5)

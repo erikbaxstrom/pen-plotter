@@ -5,7 +5,7 @@ from time import sleep
 from filemanager import FileManager
 from motorcontrol import MotorController
 from piostep import pio_step
-from printcontrol import PrintController
+from printcontrol import PrintController, PrinterGeometry
 
 
 
@@ -29,7 +29,9 @@ right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(RIGH
 left_motor = MotorController(LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION, left_sm)
 right_motor = MotorController(RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION, right_sm)
 
-print_controller = PrintController(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM, left_motor, right_motor)
+printer_geometry = PrinterGeometry(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
+
+print_controller = PrintController(CANVAS_WIDTH, left_motor, right_motor, printer_geometry)
 file_manager = FileManager(print_controller)
 
 

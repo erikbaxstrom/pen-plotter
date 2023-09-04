@@ -19,15 +19,11 @@ class PrintController:
         steps_per_mm (float): Number of motor steps per millimeter of travel.
     """
 
-    def __init__(self, canvas_width, canvas_height, steps_per_mm, left_motor, right_motor):
+    def __init__(self, canvas_width, left_motor, right_motor, printer_geometry):
         self.MAX_INTERP_DIST = 5  # units: mm
-        self.width = canvas_width
-        self.height = canvas_height
         self.home_coords = (0.5 * canvas_width, 0)
         self.current_x, self.current_y = self.home_coords
-        self.steps_per_mm = steps_per_mm
-
-
+        self.geometry = printer_geometry
         self.left_motor = left_motor
         self.right_motor = right_motor
     
@@ -39,7 +35,7 @@ class PrintController:
             side (str): Side to nudge ('left' or 'right').
             mm (float): Change in belt length in millimeters.
         """
-        steps = int(float(mm) * self.steps_per_mm)
+        steps = self.geometry.length_to_steps(mm)
         print(f"nudge {side} {mm} mm, {steps} steps")
         if side == 'left':
             self.left_motor.step(steps)
@@ -106,34 +102,16 @@ class PrintController:
 
         # TODO: interpolate
         interpolated_coordinates = [(x,y)]
-        # iterate through interpolated points 
         for x, y in interpolated_coordinates:
-            # convert interpolated coordinates (mm) to belt lengths (mm)
-            l_length, r_length = self.xy_to_lr(x, y)
-            # convert belt lengths (mm) to stepper positions (steps)
-            l_step_pos, r_step_pos = self.length_to_step_position(l_length, r_length)
-
-            print("interpolated coordinates (mm)", x, y,  "to belt lengths (mm)", l_length, r_length, "to stepper positions", l_step_pos, r_step_pos)
-            # output stepper positions to the stepper motors
+            l_length, r_length = self.geometry.xy_to_lr(x, y)
+            l_step_pos, r_step_pos = self.geometry.lengths_to_step_positions(l_length, r_length)
+            # print("interpolated coordinates (mm)", x, y,  "to belt lengths (mm)", l_length, r_length, "to stepper positions", l_step_pos, r_step_pos)
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
             while self.left_motor.is_busy or self.right_motor.is_busy:
-                # print('not ready: left, right', self.left_motor.is_busy, self.right_motor.is_busy)
                 sleep(0.1)
-                
         self.current_x = x
         self.current_y = y
-
-    def xy_to_lr(self, x, y):
-            l_length = sqrt((x**2 + (self.height - y)**2 ))
-            r_length = sqrt(((self.width - x)**2 + (self.height - y)**2 ))
-            return l_length, r_length
-
-    def length_to_step_position(self, l_length, r_length):
-            l_step_pos = int(l_length * self.steps_per_mm)
-            r_step_pos = int(r_length * self.steps_per_mm)
-            return l_step_pos, r_step_pos
-
 
     def deactivate_motors(self):
         """Deactivate both left and right motors."""
@@ -142,6 +120,38 @@ class PrintController:
 
 
 
+class PrinterGeometry:
+    """Geometry for the printer
+        
+        Args:
+        canvas_width (float): Width of the canvas in mm.
+        canvas_height (float): Height of the canvas in mm.
+        steps_per_mm (float): Number of motor steps per millimeter of travel.
+        """
+
+    def __init__(self, canvas_width, canvas_height, steps_per_mm):
+        self.canvas_height = canvas_height
+        self.canvas_width = canvas_width
+        self.steps_per_mm = steps_per_mm
+
+    def xy_to_step_positions(self, x, y):
+        l, r = self.xy_to_lr(x,y)
+        l_step_pos, r_step_pos = self.lengths_to_step_positions(l, r)
+        return l_step_pos, r_step_pos
+
+    def xy_to_lr(self, x, y):
+        l_length = sqrt((x**2 + (self.canvas_height - y)**2 ))
+        r_length = sqrt(((self.canvas_width - x)**2 + (self.canvas_height - y)**2 ))
+        return l_length, r_length
+
+    def lengths_to_step_positions(self, l_length, r_length):
+        l_step_pos = self.length_to_steps(l_length)
+        r_step_pos = self.length_to_steps(r_length)
+        return l_step_pos, r_step_pos
+    
+    def length_to_steps(self, length):
+        return int(length * self.steps_per_mm)
+    
 
 # # # TEST CODE
 

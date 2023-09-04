@@ -59,7 +59,6 @@ class PrintController:
         self.deactivate_motors()
         
 
-    # move to print manger class
     def print_gcode(self, string): 
         """Print a string of G-code commands.
 
@@ -103,8 +102,7 @@ class PrintController:
         # TODO: interpolate
         interpolated_coordinates = [(x,y)]
         for x, y in interpolated_coordinates:
-            l_length, r_length = self.geometry.xy_to_lr(x, y)
-            l_step_pos, r_step_pos = self.geometry.lengths_to_step_positions(l_length, r_length)
+            l_step_pos, r_step_pos = self.geometry.xy_to_step_positions(x, y)
             # print("interpolated coordinates (mm)", x, y,  "to belt lengths (mm)", l_length, r_length, "to stepper positions", l_step_pos, r_step_pos)
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
@@ -135,16 +133,8 @@ class PrinterGeometry:
         self.steps_per_mm = steps_per_mm
 
     def xy_to_step_positions(self, x, y):
-        l, r = self.xy_to_lr(x,y)
-        l_step_pos, r_step_pos = self.lengths_to_step_positions(l, r)
-        return l_step_pos, r_step_pos
-
-    def xy_to_lr(self, x, y):
         l_length = sqrt((x**2 + (self.canvas_height - y)**2 ))
         r_length = sqrt(((self.canvas_width - x)**2 + (self.canvas_height - y)**2 ))
-        return l_length, r_length
-
-    def lengths_to_step_positions(self, l_length, r_length):
         l_step_pos = self.length_to_steps(l_length)
         r_step_pos = self.length_to_steps(r_length)
         return l_step_pos, r_step_pos

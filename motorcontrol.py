@@ -59,7 +59,7 @@ class MotorController:
 
     def busy_handler(self, sm):
         """Handler for PIO interrupts indicating completion of state machine output"""
-        print('handler running with is_busy = ', self.is_busy)
+        # print('handler running with is_busy = ', self.is_busy)
         self.is_busy = False
 
     def step(self, steps):
@@ -80,7 +80,7 @@ class MotorController:
         bitmask = int( ''.join(pattern) , 2)
         self.sm.put(steps)
         self.sm.put(bitmask)
-        print('done put steps, bitmask', bitmask, steps)
+        print('put steps, bitmask', bitmask, steps)
 
     def step_to(self, position):
         """
@@ -90,7 +90,7 @@ class MotorController:
             position (int): Target position.
         """
 
-        print('step_to position', position)
+        # print('step_to position', position)
         rel_steps = position - self.current_position
         self.step(rel_steps)
         self.current_position = position

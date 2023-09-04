@@ -45,9 +45,8 @@ class PrintController:
             side (str): Side to nudge ('left' or 'right').
             mm (float): Change in belt length in millimeters.
         """
-        print('nudging nudge', side, mm)
         steps = int(float(mm) * self.steps_per_mm)
-        print('steps', steps)
+        print(f"nudge {side} {mm} mm, {steps} steps")
         if side == 'left':
             self.left_motor.step(steps)
         if side == 'right':
@@ -79,7 +78,6 @@ class PrintController:
         """
         
         for code in string.split('\n'):
-            print('processing code', code)
             self.execute_gcode(code)
         self.deactivate_motors()
 
@@ -94,10 +92,9 @@ class PrintController:
         gcodelets = code.split(' ')
         command = gcodelets[0]
         if command == ';':
-            print('passing over a ;comment', code)
             return
         if command == 'G1':
-            print('found a g1 code, will print now', code)
+            print('Printing', code)
             x = gcodelets[2][1:]
             y = gcodelets[3][1:]
             x = float(x)
@@ -128,8 +125,8 @@ class PrintController:
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
             while self.left_motor.is_busy or self.right_motor.is_busy:
-                print('not ready: left, right', self.left_motor.is_busy, self.right_motor.is_busy)
-                sleep(1)
+                # print('not ready: left, right', self.left_motor.is_busy, self.right_motor.is_busy)
+                sleep(0.1)
                 
         self.current_x = x
         self.current_y = y

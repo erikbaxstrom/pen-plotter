@@ -9,10 +9,11 @@ from printcontrol import PrintController, PrinterGeometry
 
 
 
-
 STEPS_PER_MM = 51.2  # 2048 steps per revolution. 40 mm per revolution
-CANVAS_WIDTH = 812  # units: mm (measured as 31 31/32")
-CANVAS_HEIGHT = 889  # units: mm (measured as 35")
+PRINTER_TOTAL_WIDTH = 812  # units: mm. Total width, pulley center to pulley center. (measured as 31 31/32")
+PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
+# CANVAS_WIDTH = 812  # units: mm (measured as 31 31/32")
+
 
 LEFT_SM_BASE_PIN = 6
 RIGHT_SM_BASE_PIN = 2
@@ -20,18 +21,17 @@ LEFT_SM_NUMBER = 0
 RIGHT_SM_NUMBER = 1
 LEFT_MOTOR_DIRECTION = 1
 RIGHT_MOTOR_DIRECTION = -1
-LEFT_MOTOR_HOME_POSITION = RIGHT_MOTOR_HOME_POSITION = 50038   # center-bottom position is length * steps/mm. 
+
 
 
 left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
 right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(RIGHT_SM_BASE_PIN), out_base=Pin(RIGHT_SM_BASE_PIN))
 
-left_motor = MotorController(LEFT_MOTOR_DIRECTION, LEFT_MOTOR_HOME_POSITION, left_sm)
-right_motor = MotorController(RIGHT_MOTOR_DIRECTION, RIGHT_MOTOR_HOME_POSITION, right_sm)
+left_motor = MotorController(LEFT_MOTOR_DIRECTION, left_sm)
+right_motor = MotorController(RIGHT_MOTOR_DIRECTION, right_sm)
 
-printer_geometry = PrinterGeometry(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
-
-print_controller = PrintController(left_motor, right_motor, printer_geometry)
+printer_geometry = PrinterGeometry(PRINTER_TOTAL_WIDTH, PRINTER_TOTAL_HEIGHT)
+print_controller = PrintController(left_motor, right_motor, printer_geometry, STEPS_PER_MM)
 file_manager = FileManager(print_controller)
 
 
@@ -72,9 +72,12 @@ G1 F2300.0 X350 Y0 Z-3.3
 
     print('\n--  Print Controller Nudge Route --')
     print_controller.nudge(side='left', mm=-20)
-    print_controller.nudge(side='right', mm=-30)
+    print_controller.nudge(side='right', mm=-20)
     sleep(5)
     print_controller.go_to_home()
+    sleep(5)
+    print_controller.nudge(side='left', mm=20)
+    print_controller.nudge(side='right', mm=20)
     sleep(5)
     print('success!')
 

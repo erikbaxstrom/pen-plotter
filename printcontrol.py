@@ -17,22 +17,18 @@ class PrintController:
         steps_per_mm (float): Number of motor steps per millimeter of travel.
     """
 
-    def __init__(self, left_motor, right_motor, printer_geometry):
+    def __init__(self, left_motor, right_motor, printer_geometry, steps_per_mm):
         self.geometry = printer_geometry
         self.left_motor = left_motor
         self.right_motor = right_motor
-        self.current_x = self.geometry.home_x
-        self.current_y = self.geometry.home_y
+        self.steps_per_mm = steps_per_mm
+        self.set_new_home()
     
 
-    def nudge(self, side, mm):
-        """Nudge the print head position by changing the left or right belt lengths.
 
-        Args:
-            side (str): Side to nudge ('left' or 'right').
-            mm (float): Change in belt length in millimeters.
-        """
-        steps = self.geometry.length_to_steps(mm)
+    def nudge(self, side, mm):
+        """Nudge the print head position by changing the left or right belt lengths (mm) """
+        steps = self.length_to_steps(mm)
         print(f"nudge {side} {mm} mm, {steps} steps")
         if side == 'left':
             self.left_motor.step(steps)
@@ -45,9 +41,8 @@ class PrintController:
         """Set the current position as the home position for the print head."""
         self.current_x = self.geometry.home_x
         self.current_y = self.geometry.home_y
-        self.left_motor.set_home()
-        self.right_motor.set_home()
-
+        self.left_motor.current_position = self.length_to_steps(self.geometry.home_length)
+        self.right_motor.current_position = self.length_to_steps(self.geometry.home_length)
 
     def go_to_home(self):
         """Move print head to home position."""
@@ -58,11 +53,7 @@ class PrintController:
         
 
     def print_gcode(self, string): 
-        """Print a string of G-code commands.
-
-        Args:
-            string (str): G-code commands separated by newline characters.
-        """
+        """Print a string of G-code commands separated by newline characters. """
         
         for code in string.split('\n'):
             self.execute_gcode(code)
@@ -70,11 +61,7 @@ class PrintController:
 
 
     def execute_gcode(self, code):
-        """Execute a single G-code command.
-
-        Args:
-            code (str): G-code command.
-        """
+        """Execute a single G-code command."""
 
         gcodelets = code.split(' ')
         command = gcodelets[0]
@@ -91,19 +78,17 @@ class PrintController:
         
 
     def move_to_coord(self, x, y):
-        """Move the print head to the specified x, y coordinate.
-        Args:
-            x (float): X-coordinate.
-            y (float): Y-coordinate.
-        """
+        """Move the print head to the specified x, y coordinate."""
 
         # TODO: interpolate
         interpolated_coordinates = [(x,y)]
         for x, y in interpolated_coordinates:
-            l_step_pos, r_step_pos = self.geometry.xy_to_step_positions(x, y)
-            # print("interpolated coordinates (mm)", x, y,  "to belt lengths (mm)", l_length, r_length, "to stepper positions", l_step_pos, r_step_pos)
+            l, r = self.geometry.xy_to_lr(x, y)
+            l_step_pos = self.length_to_steps(l)
+            r_step_pos = self.length_to_steps(r)
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
+            print("converted coordinates (mm)", x, y,  "to belt lengths (mm)", l, r, "to stepper positions", l_step_pos, r_step_pos)
             while self.left_motor.is_busy or self.right_motor.is_busy:
                 sleep(0.1)
         self.current_x = x
@@ -120,31 +105,25 @@ class PrintController:
         self.right_motor.reset()
         
 
-class PrinterGeometry:
-    """Geometry for the printer
-        
-        Args:
-        canvas_width (float): Width of the canvas in mm.
-        canvas_height (float): Height of the canvas in mm.
-        steps_per_mm (float): Number of motor steps per millimeter of travel.
-        """
-
-    def __init__(self, canvas_width, canvas_height, steps_per_mm):
-        self.canvas_height = canvas_height
-        self.canvas_width = canvas_width
-        self.steps_per_mm = steps_per_mm
-        self.home_x = 0.5 * canvas_width
-        self.home_y = 0
-
-    def xy_to_step_positions(self, x, y):
-        l_length = sqrt((x**2 + (self.canvas_height - y)**2 ))
-        r_length = sqrt(((self.canvas_width - x)**2 + (self.canvas_height - y)**2 ))
-        l_step_pos = self.length_to_steps(l_length)
-        r_step_pos = self.length_to_steps(r_length)
-        return l_step_pos, r_step_pos
-    
     def length_to_steps(self, length):
         return int(length * self.steps_per_mm)
+
+class PrinterGeometry:
+    """Geometry for the printer"""
+
+    def __init__(self, total_width, total_height):
+        self.total_height = total_height
+        self.total_width = total_width
+        self.home_x = 0.5 * total_width
+        self.home_y = 0
+        self.home_length = sqrt((self.home_x)**2 + self.total_height**2)
+
+    def xy_to_lr(self, x, y):
+        l_length = sqrt((x**2 + (self.total_height - y)**2 ))
+        r_length = sqrt(((self.total_width - x)**2 + (self.total_height - y)**2 ))
+        return l_length, r_length
+    
+
     
 
 # # # TEST CODE

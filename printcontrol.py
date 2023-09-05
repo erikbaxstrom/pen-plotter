@@ -86,9 +86,9 @@ class PrintController:
             l, r = self.geometry.xy_to_lr(x, y)
             l_step_pos = self.length_to_steps(l)
             r_step_pos = self.length_to_steps(r)
+            print("converted coordinates (mm)", x, y,  "to belt lengths (mm)", l, r, "to stepper positions", l_step_pos, r_step_pos)
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
-            print("converted coordinates (mm)", x, y,  "to belt lengths (mm)", l, r, "to stepper positions", l_step_pos, r_step_pos)
             while self.left_motor.is_busy or self.right_motor.is_busy:
                 sleep(0.1)
         self.current_x = x
@@ -111,16 +111,21 @@ class PrintController:
 class PrinterGeometry:
     """Geometry for the printer"""
 
-    def __init__(self, total_width, total_height):
-        self.total_height = total_height
+    def __init__(self, total_width, total_height, canvas_width):
         self.total_width = total_width
-        self.home_x = 0.5 * total_width
+        self.total_height = total_height
+        self.canvas_width = canvas_width
+        self.home_x = 0.5 * canvas_width
         self.home_y = 0
-        self.home_length = sqrt((self.home_x)**2 + self.total_height**2)
+        self.home_length = sqrt((self.total_width/2)**2 + self.total_height**2)
+        self.left_margin = 0.5 * (self.total_width - self.canvas_width)
+        print('home_x', self.home_x, 'home_y', self.home_y, 'homelength', self.home_length)
 
     def xy_to_lr(self, x, y):
-        l_length = sqrt((x**2 + (self.total_height - y)**2 ))
-        r_length = sqrt(((self.total_width - x)**2 + (self.total_height - y)**2 ))
+        x_tot = x + self.left_margin
+        depth = self.total_height - y
+        l_length = sqrt( depth**2 + x_tot**2 )
+        r_length = sqrt( depth**2 + (self.total_width - x_tot)**2 )
         return l_length, r_length
     
 

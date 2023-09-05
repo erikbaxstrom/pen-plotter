@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, ceil
 from time import sleep
 
 
@@ -48,7 +48,7 @@ class PrintController:
         """Move print head to home position."""
         self.move_to_coord(self.geometry.home_x, self.geometry.home_y)
         while self.left_motor.is_busy or self.right_motor.is_busy:
-            sleep(1)
+            sleep(0)
         self.deactivate_motors()
         
 
@@ -81,8 +81,8 @@ class PrintController:
         """Move the print head to the specified x, y coordinate."""
 
         # TODO: interpolate
-        interpolated_coordinates = [(x,y)]
-        for x, y in interpolated_coordinates:
+        interpolated_coordinates = self.interpolate(x,y, 1)
+        for (x, y) in interpolated_coordinates:
             l, r = self.geometry.xy_to_lr(x, y)
             l_step_pos = self.length_to_steps(l)
             r_step_pos = self.length_to_steps(r)
@@ -90,9 +90,28 @@ class PrintController:
             self.left_motor.step_to(l_step_pos)
             self.right_motor.step_to(r_step_pos)
             while self.left_motor.is_busy or self.right_motor.is_busy:
-                sleep(0.1)
+                sleep(0)
         self.current_x = x
         self.current_y = y
+
+    def interpolate(self, x, y, max_distance):
+        start_x = self.current_x
+        start_y = self.current_y
+        end_x = x
+        end_y = y
+        interp_steps = []
+        # calc distance
+        distance = sqrt( (end_x - start_x)**2 + (end_y - start_y)**2)
+        # calc the number of steps (distance / max_dist, rounded up)
+        interp_step_count = int(ceil(distance / max_distance))
+        # iterate over steps, using math to get next xy
+        for i in range(1, (interp_step_count + 1)):
+            incr_x = start_x + i * (end_x - start_x) / interp_step_count
+            incr_y = start_y + i * (end_y - start_y) / interp_step_count
+            # add coordinates to array
+            interp_steps.append((incr_x, incr_y))
+        print('interp steps', interp_steps)
+        return interp_steps
 
     def deactivate_motors(self):
         """Deactivate both left and right motors."""

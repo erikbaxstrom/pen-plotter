@@ -18,7 +18,7 @@ def pio_step():
     mov(osr, y) # put the pattern into the osr
 
     label("step")
-    out(pins, 4) [27] # output four bits from the osr to the pins
+    out(pins, 4) [11] # output four bits from the osr to the pins
     jmp(x_dec, "loop") # decrement x and jump back to the beginning of the loop
 
     label("end")

@@ -8,7 +8,6 @@ class MotorController:
         base_pin (int): Base GPIO pin number for the state machine output. Corresponds to ULN2003 controller Input 1.
         sm_number (int): State machine number.
         motor_direction (int): Motor direction (1 for clockwise, -1 for counterclockwise).
-        home_position (int): Initial position of the motor. 
 
     Attributes:
         current_position (int): Current motor position.
@@ -17,11 +16,10 @@ class MotorController:
 
     """
 
-    def __init__(self, motor_direction, home_position, state_machine):
+    def __init__(self, motor_direction, state_machine):
         self.pattern = ('0001', '0010', '0100', '1000') * 2
         self.motor_direction = motor_direction
-        self.home_position = home_position
-        self.current_position = home_position
+        self.current_position = 0
         self.sm = state_machine
         self.sm.irq(self.busy_handler)
         self.is_busy = False
@@ -51,10 +49,6 @@ class MotorController:
     def reset(self):
         self.sm.restart()
 
-    def set_home(self, position=None):
-        if position is None:
-            position = self.home_position
-        self.current_position = position
 
     def busy_handler(self, sm):
         """Handler for PIO interrupts indicating completion of state machine output"""
@@ -79,7 +73,7 @@ class MotorController:
         bitmask = int( ''.join(pattern) , 2)
         self.sm.put(steps)
         self.sm.put(bitmask)
-        print('put steps, bitmask', bitmask, steps)
+        print('put steps, bitmask', steps, bitmask)
 
     def step_to(self, position):
         """

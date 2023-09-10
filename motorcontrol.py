@@ -1,11 +1,3 @@
-from time import sleep
-
-from machine import Pin
-from rp2 import StateMachine, PIO
-
-from piostep import pio_step
-
-
 class MotorController:
     """Controls a stepper motor
 
@@ -16,7 +8,6 @@ class MotorController:
         base_pin (int): Base GPIO pin number for the state machine output. Corresponds to ULN2003 controller Input 1.
         sm_number (int): State machine number.
         motor_direction (int): Motor direction (1 for clockwise, -1 for counterclockwise).
-        home_position (int): Initial position of the motor. 
 
     Attributes:
         current_position (int): Current motor position.
@@ -25,13 +16,14 @@ class MotorController:
 
     """
 
-    def __init__(self, base_pin, sm_number, motor_direction, home_position):
-        print('init state machine. base pin, sm #', base_pin, sm_number)
-        self.pattern = ('0001', '0010', '0100', '1000') * 2
+    def __init__(self, motor_direction, state_machine):
+        # self.base_pattern = ('0001', '0010', '0100', '1000') * 2    # Wave Mode
+        self.base_pattern = ('0011', '0110', '1100', '1001') * 2    # Full Step Mode
+        # self.base_pattern = ('0001', '0011', '0010', '0110', '0100', '1100', '1000', '1001')    # Half Step Mode
         self.motor_direction = motor_direction
-        self.current_position = home_position
-        self.sm = StateMachine(sm_number, pio_step, freq=10000, set_base=Pin(base_pin), 
-        out_base=Pin(base_pin))
+        self.current_position = 0
+        self.pattern_index = 0
+        self.sm = state_machine
         self.sm.irq(self.busy_handler)
         self.is_busy = False
         self.enabled = False
@@ -57,10 +49,15 @@ class MotorController:
     def enabled(self):
         return self._enabled
 
+    def reset(self):
+        self.sm.restart()
+
+
     def busy_handler(self, sm):
         """Handler for PIO interrupts indicating completion of state machine output"""
-        print('handler running with is_busy = ', self.is_busy)
+        # print('handler running with is_busy = ', self.is_busy)
         self.is_busy = False
+        self.sm.restart()
 
     def step(self, steps):
         """
@@ -73,14 +70,23 @@ class MotorController:
         self.is_busy = True
         self.enabled = True
         steps *= self.motor_direction
-        pattern = self.pattern
-        if steps < 0:
-            pattern = list(reversed(pattern))
-            steps = -steps
+
+        pattern = []
+        for i in range(0, 8):
+            idx = (i + self.pattern_index) % 8
+            if steps < 0:
+                idx *= -1
+            pattern.append( self.base_pattern[idx] )
+        self.pattern_index = (steps + self.pattern_index )% 8
         bitmask = int( ''.join(pattern) , 2)
+
+        if steps < 0:
+            steps = -steps
+        # print('pattern is ', pattern)
         self.sm.put(steps)
         self.sm.put(bitmask)
-        print('done put steps, bitmask', bitmask, steps)
+        # print('put steps, bitmask, pattern', steps, bitmask, pattern)
+
 
     def step_to(self, position):
         """
@@ -89,8 +95,7 @@ class MotorController:
         Args:
             position (int): Target position.
         """
-
-        print('step_to position', position)
+        
         rel_steps = position - self.current_position
         self.step(rel_steps)
         self.current_position = position
@@ -100,14 +105,7 @@ class MotorController:
 
 
 
-        # adjust index
-        # adjust bitmask 
-            # check sign
-            # right or left shift according to sign
-                # left: (pattern << bits)|(pattern >> (32 - bits))
-                # right: (pattern >> bits)|(pattern << (32 - bits)) & 0xFFFFFFFF
-            # forward or reverse pattern according to sign
-        # call the state machine
+
 
 
 
@@ -119,22 +117,71 @@ class MotorController:
 
 # # TEST CODE
 
+# from time import sleep
+
+# from machine import Pin
+# from rp2 import StateMachine, PIO
+
+# from piostep import pio_step
+
 # # init the state machine 
 # LEFT_SM_BASE_PIN = 6
 # RIGHT_SM_BASE_PIN = 2
 # LEFT_SM_NUMBER = 0
 # RIGHT_SM_NUMBER = 1
-# LEFT_MOTOR_DIRECTION = -1
-# RIGHT_MOTOR_DIRECTION = 1
+# LEFT_MOTOR_DIRECTION = 1
+# RIGHT_MOTOR_DIRECTION = -1
 
-# left_motor = MotorController(LEFT_SM_BASE_PIN, LEFT_SM_NUMBER, LEFT_MOTOR_DIRECTION, 0)
-# right_motor = MotorController(RIGHT_SM_BASE_PIN, RIGHT_SM_NUMBER, RIGHT_MOTOR_DIRECTION, 0)
+# left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
+
+# left_motor = MotorController(LEFT_MOTOR_DIRECTION, left_sm)
+
+
+# # run a test sequence
+# steps = [-5000, 3000, -3000, 5000]
+
+# for step in steps:
+#     while left_motor.is_busy:
+#         # print('not ready: left, right', left_motor.is_busy, right_motor.is_busy)
+#         sleep(0.1)
+#     print('calling steps', step)
+#     left_motor.step(step)
+# while left_motor.is_busy:
+#     sleep(1)
+# left_motor.enabled = False
+
+
+
+
+
+# # TEST CODE
+
+# from time import sleep
+
+# from machine import Pin
+# from rp2 import StateMachine, PIO
+
+# from piostep import pio_step
+
+# # init the state machine 
+# LEFT_SM_BASE_PIN = 6
+# RIGHT_SM_BASE_PIN = 2
+# LEFT_SM_NUMBER = 0
+# RIGHT_SM_NUMBER = 1
+# LEFT_MOTOR_DIRECTION = 1
+# RIGHT_MOTOR_DIRECTION = -1
+
+# left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
+# right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(RIGHT_SM_BASE_PIN), out_base=Pin(RIGHT_SM_BASE_PIN))
+
+# left_motor = MotorController(LEFT_MOTOR_DIRECTION, left_sm)
+# right_motor = MotorController(RIGHT_MOTOR_DIRECTION, right_sm)
 # # sleep(1)
 
 
 # # run a test sequence (run steps, wait, run more steps, wait, run negative steps)
 # # steps = [(2048, 0), (0, 0), (0, 0)]
-# blah = 2048 * 5
+# blah = 3
 # steps = [(blah, blah), (-blah, -blah)]
 
 # for step in steps:

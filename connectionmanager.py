@@ -16,7 +16,6 @@ def connect_wifi():
 
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    # network.hostname('plotter')
     print('using', WIFI_KEY, WIFI_SSID)
     wlan.connect(WIFI_SSID, WIFI_KEY)
     while wlan.isconnected() == False:
@@ -25,7 +24,3 @@ def connect_wifi():
     print(wlan.ifconfig())
     ip = wlan.ifconfig()[0]
     return ip
-
-
-# # Test Code
-# connect_wifi()

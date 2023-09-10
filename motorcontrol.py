@@ -17,9 +17,9 @@ class MotorController:
     """
 
     def __init__(self, motor_direction, state_machine):
-        # self.base_pattern = ('0001', '0010', '0100', '1000') * 2
-        self.base_pattern = ('0011', '0110', '1100', '1001') * 2
-        # self.base_pattern = ('0001', '0011', '0010', '0110', '0100', '1100', '1000', '1001')
+        # self.base_pattern = ('0001', '0010', '0100', '1000') * 2    # Wave Mode
+        self.base_pattern = ('0011', '0110', '1100', '1001') * 2    # Full Step Mode
+        # self.base_pattern = ('0001', '0011', '0010', '0110', '0100', '1100', '1000', '1001')    # Half Step Mode
         self.motor_direction = motor_direction
         self.current_position = 0
         self.pattern_index = 0

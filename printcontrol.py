@@ -108,15 +108,11 @@ class PrintController:
         end_x = x
         end_y = y
         interp_steps = []
-        # calc distance
         distance = sqrt( (end_x - start_x)**2 + (end_y - start_y)**2)
-        # calc the number of steps (distance / max_dist, rounded up)
         interp_step_count = int(ceil(distance / max_distance))
-        # iterate over steps, using math to get next xy
         for i in range(1, (interp_step_count + 1)):
             incr_x = start_x + i * (end_x - start_x) / interp_step_count
             incr_y = start_y + i * (end_y - start_y) / interp_step_count
-            # add coordinates to array
             interp_steps.append((round(incr_x, 2), round(incr_y, 2)))
         print('interp steps', interp_steps)
         return interp_steps
@@ -155,24 +151,4 @@ class PrinterGeometry:
         r_length = sqrt( depth**2 + (self.total_width - x_tot)**2 )
         # print('xy_to_lr:', 'x', x, 'y', y,  'xtot', x_tot, 'depth', depth, 'l_length', l_length, 'r_length', r_length)
         return l_length, r_length
-    
 
-    
-
-# # # TEST CODE
-
-
-# STEPS_PER_MM = 2048 / 40  # 2048 steps per revolution. 40 mm per revolution
-# CANVAS_WIDTH = 812  # units: mm (measured as 31 31/32")
-# CANVAS_HEIGHT = 889  # units: mm (measured as 35")
-
-# center = CANVAS_WIDTH/2
-# test_coords = [(center,0), (center + 100, 0), (center + 100, 200), (center - 100, 200), (center - 100, 0), (center, 0)]
-# controller = print_controller(CANVAS_WIDTH, CANVAS_HEIGHT, STEPS_PER_MM)
-
-
-# for coord in test_coords:
-#     print("calling controller.move_to_coord()", coord)
-#     controller.move_to_coord(coord[0], coord[1])
-
-# controller.finish_print()

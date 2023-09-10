@@ -9,8 +9,8 @@ from printcontrol import PrintController, PrinterGeometry
 
 
 
-STEPS_PER_MM = 51.2  # 2048 steps per revolution. 40 mm per revolution
-# STEPS_PER_MM = 102.4  # 2048 steps per revolution. 40 mm per revolution
+STEPS_PER_MM = 51.2  # Wave and Full Step Mode. 2048 steps per revolution. 40 mm per revolution
+# STEPS_PER_MM = 102.4  # Half Step Mode. 4096 steps per revolution. 40 mm per revolution
 PRINTER_TOTAL_WIDTH = 812  # units: mm. Total width, pulley center to pulley center. (measured as 31 31/32")
 PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
 CANVAS_WIDTH = 215  # 8.5" = 215 mm

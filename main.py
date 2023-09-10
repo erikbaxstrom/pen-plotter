@@ -11,10 +11,9 @@ from printcontrol import PrintController, PrinterGeometry
 
 
 
-STEPS_PER_MM = 51.2  # 2048 steps per revolution. 40 mm per revolution
-# STEPS_PER_MM = 102.4  # 2048 steps per revolution. 40 mm per revolution
+STEPS_PER_MM = 51.2  # Wave and Full Step Mode. 2048 steps per revolution. 40 mm per revolution
+# STEPS_PER_MM = 102.4  # Half Step Mode. 4096 steps per revolution. 40 mm per revolution
 PRINTER_TOTAL_WIDTH = 812  # units: mm. Total width, pulley center to pulley center. (measured as 31 31/32")
-# PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
 PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
 CANVAS_WIDTH = 215  # 8.5" = 215 mm
 
@@ -41,7 +40,6 @@ def index(request):
 
 @app.route('/api/v1/upload', methods=['POST'])
 def fileUpload(request):
-    # print('Content-Range, Disposition', request.headers['Content-Range'], request.headers['Content-Disposition'])
     file_manager.add_to_print_file(request.body)
     blah = request.body
     return 'Success!', 200
@@ -71,7 +69,6 @@ def go_home(request):
 
 @app.route('/api/v1/hard-stop')
 def deactivate_motors(request):
-    # print('req arg', request.args.getlist('active')[0], bool(request.args.getlist('active')[0]))
     print_controller.hard_stop_motors()
     return 'woohoo', 200
 
@@ -95,4 +92,3 @@ try:
     app.run(host=ip, port=80, debug=True)
 except KeyboardInterrupt:
     print('broke')
-    # machine.reset()

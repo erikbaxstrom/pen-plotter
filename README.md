@@ -1,17 +1,63 @@
-# pen-plotter
+# Overview
 
-A pen plotter
+### Why?
 
-# Stepper Speed Test
+Pen Plotters are cool.
+Genearative art is cool.
 
-moved 5 revolutions , 2048 steps per revolution , 40 steps per mm
+I fell in love with the aestehtic of pen plots when I saw [this video](https://youtu.be/gLG6Mp4n-Ms?si=5o8p-6Cip7ZlzuvK) on youtube. There's something magical about controlling the movement of a pen with a robot. And there a lot of cool possibilities with algorithmically generated art, and much of the [original computer generated art](https://piratefsh.github.io/2019/01/07/computer-art-history-part-2.html) was drawn with pen plotters.
 
-| nop() count | Time Up | Time Down | notes                             |
-| ----------- | ------- | --------- | --------------------------------- |
-| 15          | 21      | 16        | left motor failed to lift gondola |
-| 18          | 22      | 22        | worked, but a few skipped steps   |
-| 20          | 25      | 23        |
-| 22          | 27      | 26        |
-| 25          | 27      | 27        |
-| 28          | 33      | 32        |
-| 31          | 35      | 35        |
+# Project Goal
+
+- Designed and build a pen plotter with a web interface where you can upload gcode vector files and plot them on paper.
+- Deepen my understanding of Python
+
+### Existing Implementations
+
+There are many implementations of pen plotters using Arduino microcontrollers, including Makelangelo, Polargraph, and versions of the GRBL firmware, not to mention the Maslow CNC and countless other hacked-together CNC devices. Most of these implementations use Arduio boards and require either direct USB connection to a computer or use a rotary encoder and display built into the plotter.
+
+# Design Goals
+
+- Compact and easily stored
+- Inexpensive and simple to build
+- Controlled through a web interface
+- Supports common file format(s)
+
+### Compact and Easily Stored
+
+I have multiple hobbies, and want a plotter that doesn't take up floor or desk space. When not in use, I want to easily store it in a closet.
+
+### Inexpensive and Simple Construction
+
+As few parts as possible. Motors, belts, microcontrollers, etc should be widely available and inexpensive. Parts that require fabrication should not require specialized or precision tools.
+
+### Web Interface
+
+Controlling the plotter through a web interface requires fewer parts and is more versatile than an onboard display and control interface, and does not require a USB connection to be maintained through the duration of the print.
+
+### Vector File Formats
+
+There is no universal standard for pen plotters, especially for hobby pen plotters. However, there are some common formats. On research, gcode (ubiquitous in CNC machining) is a common format and is easy to implement. Some generative art programs and graphics editors (like Inkscape) can generate gcode, but more commonly save files in SVG format. Since past work I've done in generative art uses gcode, I implemented gcode first.
+
+# Hardware
+
+- Raspberry Pi Pico W Microcontroller
+- 2x 28BYJ-48 Stepper motors with ULN2003 motor drivers
+- 2GT 6mm pulleys and belts (standard size for 3D printers)
+
+### Raspberry Pi Pico W Microcontroller
+
+It's inexpensive, powerful, has plenty of memory and disk space, lots of I/O, and there's a version with WiFi built in. It also has unique I/O functionality that allows outputting bit sequences without using processor cycles.
+
+# Tech Stack
+
+- MicroPython for backend and plotter control
+- MicroDot library for web backend
+- Vanilla JavaScript web frontend
+
+# Planned Features
+
+- Pen lifter (currently, it only draws one continuous line)
+- SD Card support to enable much larger print files
+- Provide better feedback about plotter status through the web UI
+- Auto-homing of the pen

@@ -12,7 +12,9 @@ from printcontrol import PrintController, PrinterGeometry
 
 
 STEPS_PER_MM = 51.2  # 2048 steps per revolution. 40 mm per revolution
+# STEPS_PER_MM = 102.4  # 2048 steps per revolution. 40 mm per revolution
 PRINTER_TOTAL_WIDTH = 812  # units: mm. Total width, pulley center to pulley center. (measured as 31 31/32")
+# PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
 PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
 CANVAS_WIDTH = 215  # 8.5" = 215 mm
 
@@ -20,6 +22,7 @@ LEFT_SM_BASE_PIN = 6
 RIGHT_SM_BASE_PIN = 2
 LEFT_SM_NUMBER = 0
 RIGHT_SM_NUMBER = 1
+SM_FREQUENCY = 10000
 LEFT_MOTOR_DIRECTION = 1
 RIGHT_MOTOR_DIRECTION = -1
 
@@ -42,6 +45,11 @@ def fileUpload(request):
     file_manager.add_to_print_file(request.body)
     blah = request.body
     return 'Success!', 200
+
+@app.route('/api/v1/clearfile')
+def clearFile(request):
+    file_manager.clear_file()
+    return 'Yeah!', 200
 
 @app.route('/api/v1/print')
 def startPrint(request):
@@ -69,8 +77,9 @@ def deactivate_motors(request):
 
 
 
-left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
-right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(RIGHT_SM_BASE_PIN), out_base=Pin(RIGHT_SM_BASE_PIN))
+
+left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=SM_FREQUENCY, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
+right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=SM_FREQUENCY, set_base=Pin(RIGHT_SM_BASE_PIN), out_base=Pin(RIGHT_SM_BASE_PIN))
 
 left_motor = MotorController(LEFT_MOTOR_DIRECTION, left_sm)
 right_motor = MotorController(RIGHT_MOTOR_DIRECTION, right_sm)
@@ -81,7 +90,6 @@ file_manager = FileManager(print_controller)
 
 
 try:
-
     print('running')
     ip = connect_wifi()
     app.run(host=ip, port=80, debug=True)

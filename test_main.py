@@ -10,6 +10,7 @@ from printcontrol import PrintController, PrinterGeometry
 
 
 STEPS_PER_MM = 51.2  # 2048 steps per revolution. 40 mm per revolution
+# STEPS_PER_MM = 102.4  # 2048 steps per revolution. 40 mm per revolution
 PRINTER_TOTAL_WIDTH = 812  # units: mm. Total width, pulley center to pulley center. (measured as 31 31/32")
 PRINTER_TOTAL_HEIGHT = 914  # units: mm. height from pulley center to home position (measured as 36")
 CANVAS_WIDTH = 215  # 8.5" = 215 mm
@@ -22,10 +23,11 @@ RIGHT_SM_NUMBER = 1
 LEFT_MOTOR_DIRECTION = 1
 RIGHT_MOTOR_DIRECTION = -1
 
+SM_FREQ = 10000
 
 
-left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
-right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=10000, set_base=Pin(RIGHT_SM_BASE_PIN), out_base=Pin(RIGHT_SM_BASE_PIN))
+left_sm = StateMachine(LEFT_SM_NUMBER, pio_step, freq=SM_FREQ, set_base=Pin(LEFT_SM_BASE_PIN), out_base=Pin(LEFT_SM_BASE_PIN))
+right_sm = StateMachine(RIGHT_SM_NUMBER, pio_step, freq=SM_FREQ, set_base=Pin(RIGHT_SM_BASE_PIN), out_base=Pin(RIGHT_SM_BASE_PIN))
 
 left_motor = MotorController(LEFT_MOTOR_DIRECTION, left_sm)
 right_motor = MotorController(RIGHT_MOTOR_DIRECTION, right_sm)
@@ -40,18 +42,29 @@ try:
 
 
     print('\n--  File Manager Add File  --')
+#     test_print_file_string = """
+# ; paint
+# G1 F2300.0 X0 Y0 Z-3.3
+# ; paint
+# G1 F2300.0 X0 Y200 Z-3.3
+# ; paint
+# G1 F2300.0 X200 Y200 Z-3.3
+# ; paint
+# G1 F2300.0 X200 Y0 Z-3.3
+# ; paint
+# G1 F2300.0 X50 Y0 Z-3.3
+# ;
+# ;End of Gcode
+# """
     test_print_file_string = """
-; paint
-G1 F2300.0 X0 Y0 Z-3.3
-; paint
-G1 F2300.0 X0 Y100 Z-3.3
-; paint
-G1 F2300.0 X100 Y100 Z-3.3
-; paint
 G1 F2300.0 X100 Y0 Z-3.3
-; paint
-G1 F2300.0 X50 Y0 Z-3.3
-;
+G1 F2300.0 X150 Y100 Z-3.3
+G1 F2300.0 X100 Y0 Z-3.3
+G1 F2300.0 X150 Y100 Z-3.3
+G1 F2300.0 X100 Y0 Z-3.3
+G1 F2300.0 X150 Y100 Z-3.3
+G1 F2300.0 X100 Y0 Z-3.3
+G1 F2300.0 X150 Y100 Z-3.3
 ;End of Gcode
 """
     file_manager.add_to_print_file(test_print_file_string.encode('utf-8'))
@@ -70,16 +83,16 @@ G1 F2300.0 X50 Y0 Z-3.3
     print('success!')
 
 
-    print('\n--  Print Controller Nudge Route --')
-    print_controller.nudge(side='left', mm=-20)
-    print_controller.nudge(side='right', mm=-20)
-    sleep(5)
-    print_controller.go_to_home()
-    sleep(5)
-    print_controller.nudge(side='left', mm=20)
-    print_controller.nudge(side='right', mm=20)
-    sleep(5)
-    print('success!')
+    # print('\n--  Print Controller Nudge Route --')
+    # print_controller.nudge(side='left', mm=-20)
+    # print_controller.nudge(side='right', mm=-20)
+    # sleep(5)
+    # print_controller.go_to_home()
+    # sleep(5)
+    # print_controller.nudge(side='left', mm=20)
+    # print_controller.nudge(side='right', mm=20)
+    # sleep(5)
+    # print('success!')
 
     print('\n--  Print Controller Deactivate Motors  --')
     print_controller.deactivate_motors()

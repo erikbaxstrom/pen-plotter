@@ -21,3 +21,7 @@ class FileManager:
         print('starting the print')
         # self.print_controller.activate_printer()
         self.print_controller.print_gcode(self.print_string)
+    
+    def clear_file(self):
+        self.print_string = ''
+

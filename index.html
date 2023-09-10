@@ -14,6 +14,7 @@
     <input type="file" id="file" name="name" />
     <button id="upload">Upload gcode</button>
     <button id="print" disabled="true">Print</button>
+    <button id="resetPrintFile">Reset Print File</button>
     <hr />
     <h2>Set Home Position</h2>
     <div id="leftNudgeControls">
@@ -40,6 +41,7 @@
       const rightNudgeControls = document.getElementById("rightNudgeControls");
       const goHomeButton = document.getElementById("goHome");
       const hardStopMotorsButton = document.getElementById("hardStopMotors");
+      const resetPrintFileButton = document.getElementById("resetPrintFile");
 
       /*  State  */
       let nudgeButtons = [
@@ -111,6 +113,11 @@
 
       hardStopMotorsButton.addEventListener("click", () => {
         let url = new URL("../api/v1/hard-stop", document.baseURI);
+        fetch(url);
+      });
+
+      resetPrintFileButton.addEventListener("click", () => {
+        let url = new URL("../api/v1/clearfile", document.baseURI);
         fetch(url);
       });
 

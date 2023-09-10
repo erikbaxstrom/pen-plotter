@@ -13,6 +13,7 @@ class FileManager:
 
     def add_to_print_file(self, data):
         self.print_string += data.decode('utf-8')
+        self.print_string += '\n'
         return
     
     def start_print(self):

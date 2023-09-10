@@ -46,7 +46,7 @@ class PrintController:
 
     def go_to_home(self):
         """Move print head to home position."""
-        self.move_to_coord(self.geometry.home_x, self.geometry.home_y)
+        self.g0_to_coord(self.geometry.home_x, self.geometry.home_y)
         while self.left_motor.is_busy or self.right_motor.is_busy:
             sleep(0)
         self.deactivate_motors()
@@ -73,15 +73,21 @@ class PrintController:
             y = gcodelets[3][1:]
             x = float(x)
             y = float(y)
-            self.move_to_coord(x, y)
+            self.g1_to_coord(x, y)
             return
+        if command == 'G0':
+            print('G0 to', code)
         
+    def g1_to_coord(self, x, y):
+        self.move_to_coord(x, y, 1)
+    
+    def g0_to_coord(self, x, y):
+        self.move_to_coord(x, y, 0)
 
-    def move_to_coord(self, x, y):
+
+    def move_to_coord(self, x, y, interp_dist):
         """Move the print head to the specified x, y coordinate."""
-
-        # TODO: interpolate
-        interpolated_coordinates = self.interpolate(x,y, 1)
+        interpolated_coordinates = self.interpolate(x,y, interp_dist)
         for (x, y) in interpolated_coordinates:
             l, r = self.geometry.xy_to_lr(x, y)
             l_step_pos = self.length_to_steps(l)
@@ -95,6 +101,8 @@ class PrintController:
         self.current_y = y
 
     def interpolate(self, x, y, max_distance):
+        if max_distance == 0:  #don't interpolate
+            return [(x, y)]
         start_x = self.current_x
         start_y = self.current_y
         end_x = x
@@ -109,7 +117,7 @@ class PrintController:
             incr_x = start_x + i * (end_x - start_x) / interp_step_count
             incr_y = start_y + i * (end_y - start_y) / interp_step_count
             # add coordinates to array
-            interp_steps.append((incr_x, incr_y))
+            interp_steps.append((round(incr_x, 2), round(incr_y, 2)))
         print('interp steps', interp_steps)
         return interp_steps
 
@@ -138,13 +146,14 @@ class PrinterGeometry:
         self.home_y = 0
         self.home_length = sqrt((self.total_width/2)**2 + self.total_height**2)
         self.left_margin = 0.5 * (self.total_width - self.canvas_width)
-        print('home_x', self.home_x, 'home_y', self.home_y, 'homelength', self.home_length)
+        # print('home_x', self.home_x, 'home_y', self.home_y, 'homelength', self.home_length)
 
     def xy_to_lr(self, x, y):
         x_tot = x + self.left_margin
         depth = self.total_height - y
         l_length = sqrt( depth**2 + x_tot**2 )
         r_length = sqrt( depth**2 + (self.total_width - x_tot)**2 )
+        # print('xy_to_lr:', 'x', x, 'y', y,  'xtot', x_tot, 'depth', depth, 'l_length', l_length, 'r_length', r_length)
         return l_length, r_length
     
 
